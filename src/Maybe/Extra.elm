@@ -1,7 +1,7 @@
 module Maybe.Extra ((?), join, isNothing) where
 {-| Convenience functions for Maybe.
 
-@docs (?), join, isNothing
+@docs (?), join, isNothing, isJust
 -}
 
 import Maybe (..)
