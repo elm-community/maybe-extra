@@ -13,8 +13,6 @@ import Maybe (..)
 (?) : Maybe a -> a -> a
 mx ? x = withDefault x mx
 
-
-
 {-| Flattens nested Maybes
 
     join (Just (Just 1)) == Just 1
@@ -27,8 +25,7 @@ join mx =
     Just x -> x
     Nothing -> Nothing
 
-
-{-| Conveniently check if constructed with `Nothing`.
+{-| Conveniently check if a `Maybe` matches `Nothing`.
 
       isNothing (Just 42) == False
       isNothing (Just []) == False
@@ -36,7 +33,18 @@ join mx =
 -}
 isNothing : Maybe a -> Bool
 isNothing m =
-    case m of
-      Nothing -> True
-      Just _  -> False
+  case m of
+    Nothing -> True
+    Just _  -> False
 
+{-| Conveniently check if a `Maybe` matches `Just _`.
+
+      isJust (Just 42) == True
+      isJust (Just []) == True
+      isJust Nothing   == False
+-}
+isJust : Maybe a -> Bool
+isJust m =
+  case m of
+    Nothing -> False
+    Just _  -> True
