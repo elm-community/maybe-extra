@@ -1,4 +1,4 @@
-module Maybe.Extra ((?), join, isNothing) where
+module Maybe.Extra ((?), join, isNothing, isJust) where
 {-| Convenience functions for Maybe.
 
 @docs (?), join, isNothing, isJust
@@ -27,9 +27,9 @@ join mx =
 
 {-| Conveniently check if a `Maybe` matches `Nothing`.
 
-      isNothing (Just 42) == False
-      isNothing (Just []) == False
-      isNothing Nothing   == True
+    isNothing (Just 42) == False
+    isNothing (Just []) == False
+    isNothing Nothing   == True
 -}
 isNothing : Maybe a -> Bool
 isNothing m =
@@ -39,9 +39,9 @@ isNothing m =
 
 {-| Conveniently check if a `Maybe` matches `Just _`.
 
-      isJust (Just 42) == True
-      isJust (Just []) == True
-      isJust Nothing   == False
+    isJust (Just 42) == True
+    isJust (Just []) == True
+    isJust Nothing   == False
 -}
 isJust : Maybe a -> Bool
 isJust m =
