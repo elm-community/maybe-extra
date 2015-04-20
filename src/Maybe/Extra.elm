@@ -4,7 +4,7 @@ module Maybe.Extra ((?), join, isNothing, isJust) where
 @docs (?), join, isNothing, isJust
 -}
 
-import Maybe (..)
+import Maybe exposing (..)
 
 {-| Flipped, infix version of `withDefault`.
 
