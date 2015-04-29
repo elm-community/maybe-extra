@@ -1,4 +1,7 @@
 module Maybe.Extra ((?), join, isNothing, isJust) where
+
+import Debug
+
 {-| Convenience functions for Maybe.
 
 @docs (?), join, isNothing, isJust
@@ -48,3 +51,15 @@ isJust m =
   case m of
     Nothing -> False
     Just _  -> True
+
+
+{-| The fromJust function extracts the element out of a `Just` and throws an error if its argument is `Nothing`.
+    
+    fromJust (Just 42) == 42
+    fromJust Nothing will result in crash with "fromJust: Nothing" error message
+-}
+fromJust : Maybe a -> a
+fromJust x =
+    case x of
+        Nothing -> Debug.crash "fromJust: Nothing"
+        Just x -> x
