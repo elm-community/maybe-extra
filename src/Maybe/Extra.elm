@@ -64,6 +64,6 @@ isJust m =
 -}
 or : Maybe a -> Maybe a -> Maybe a
 or ma mb =
-  if isJust ma
-    then ma
-    else mb
+  case ma of
+    Nothing -> mb
+    Just _ -> ma
