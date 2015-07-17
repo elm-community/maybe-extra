@@ -48,3 +48,22 @@ isJust m =
   case m of
     Nothing -> False
     Just _  -> True
+
+
+{-|
+  Like the boolean '||' this will return the first value that is positive ('Just').
+
+    Just 4 `or` Just 5    == Just 4
+    Just 4 `or` Nothing   == Just 4
+    Nothing `or` Just 5   == Just 5
+    Nothing `or` Nothing  == Nothing
+
+  This function sort of works like 'oneOf' but on single 'Maybe's.
+
+  Advanced functional programmers will recognize this as the implementation of 'mplus' for Maybes from the 'MonadPlus' Typeclass.
+-}
+or : Maybe a -> Maybe a -> Maybe a
+or ma mb =
+  if isJust ma
+    then ma
+    else mb
