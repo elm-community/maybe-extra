@@ -1,7 +1,13 @@
-module Maybe.Extra ((?), join, isNothing, isJust) where
+module Maybe.Extra
+  ( (?)
+  , join
+  , isNothing
+  , isJust
+  , or
+  ) where
 {-| Convenience functions for Maybe.
 
-@docs (?), join, isNothing, isJust
+@docs (?), join, isNothing, isJust, or
 -}
 
 import Maybe exposing (..)
