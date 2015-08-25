@@ -1,14 +1,11 @@
 module Maybe.Extra
-  ( (?)
-  , join
-  , isNothing
-  , isJust
+  ( (?), join, isNothing, isJust
   , map2, map3, map4, map5
-  , andMap, next, prev
-  , or
-  , listToMaybe, maybeToList, arrayToMaybe, maybeToArray
+  , andMap, next, prev, or
+  , maybeToList, maybeToArray
   , traverse, combine, traverseArray, combineArray
   ) where
+
 {-| Convenience functions for Maybe.
 
 # Common helpers
@@ -21,7 +18,7 @@ module Maybe.Extra
 @docs andMap, next, prev, or
 
 # List and array functions
-@docs listToMaybe, maybeToList, arrayToMaybe, maybeToArray, traverse, combine, traverseArray, combineArray
+@docs maybeToList, maybeToArray, traverse, combine, traverseArray, combineArray
 -}
 
 import Array
@@ -147,18 +144,6 @@ or ma mb =
     Just _ -> ma
 
 
-{-| Returns `Nothing` on an empty list or `Just a`, where `a` is the first element of the list.
-
-    listToMaybe [] == Nothing
-    listToMaybe [1,2,3] == Just 1
--}
-listToMaybe : List a -> Maybe a
-listToMaybe xs =
-  case xs of
-    [] -> Nothing
-    (x::_) -> Just x
-
-
 {-| Return an empty list on `Nothing` or a list with one element, where the element is the value of `Just`.
 
     maybeToList Nothing == []
@@ -169,16 +154,6 @@ maybeToList m =
   case m of
     Nothing -> []
     Just x -> [x]
-
-
-{-| Returns `Nothing` on an empty array or `Just a`, where `a` is the first element of the array.
-
-    arrayToMaybe (Array.fromList []) == Nothing
-    arrayToMaybe (Array.fromList [1,2,3]) == Just 1
-
--}
-arrayToMaybe : Array.Array a -> Maybe a
-arrayToMaybe = Array.get 0
 
 
 {-| Return an empty array on `Nothing` or a list with one element, where the element is the value of `Just`.
