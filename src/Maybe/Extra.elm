@@ -3,33 +3,28 @@ module Maybe.Extra
   , join
   , isNothing
   , isJust
-  , keepJusts
-  , maybe
-  , unsafe
   , map2, map3, map4, map5
-  , mapReplaceBy
-  , ap, next, prev
+  , andMap, next, prev
   , or
   , listToMaybe, maybeToList, arrayToMaybe, maybeToArray
-  , traverse, sequence, traverseArray, sequenceArray
+  , traverse, combine, traverseArray, combineArray
   ) where
 {-| Convenience functions for Maybe.
 
 # Common helpers
-@docs (?), join, isNothing, isJust, keepJusts, maybe, unsafe
+@docs (?), join, isNothing, isJust
 
 # Map
 @docs map2, map3, map4, map5
 
 # Applicative functions
-@docs mapReplaceBy, ap, next, prev, or
+@docs andMap, next, prev, or
 
 # List and array functions
-@docs listToMaybe, maybeToList, arrayToMaybe, maybeToArray, traverse, sequence, traverseArray, sequenceArray
+@docs listToMaybe, maybeToList, arrayToMaybe, maybeToArray, traverse, combine, traverseArray, combineArray
 -}
 
 import Array
-import Debug
 import Maybe exposing (..)
 
 {-| Flipped, infix version of `withDefault`.
@@ -75,38 +70,6 @@ isJust m =
     Nothing -> False
     Just _  -> True
 
-{-| Take a list of `Maybe`s and return the list of all values inside `Just`s.
-
-    keepJusts [Nothing, Just 1, Nothing, Just 2, Just 3] == [1,2,3]
--}
-keepJusts : List (Maybe a) -> List a
-keepJusts =
-  let
-    step e acc =
-      case e of
-        Nothing -> acc
-        Just x -> x::acc
-  in
-    List.foldr step []
-
-
-{-| Take default value, a function, and a `Maybe` value. If the `Maybe` value is `Nothing`, the function returns the default value. Otherwise, it applies the function to the value of `Just` and returns the result.
-
-    maybe [] ((::)0) Nothing == []
-    maybe [] ((::)0) (Just [1,2,3]) == [0,1,2,3]
--}
-maybe : b -> (a -> b) -> Maybe a -> b
-maybe d f = withDefault d << map f
-
-
-{-| Extracts the value, if it's `Just`, or throw an error, if it's `Nothing`.
--}
-unsafe : Maybe a -> a
-unsafe v =
-  case v of
-    Nothing -> Debug.crash "Can't extract value from Nothing!"
-    Just x -> x
-
 
 {-| Combine two `Maybe`s with the given function. If one of the `Maybe`s is `Nothing`, the result is `Nothing`.
 
@@ -114,39 +77,31 @@ unsafe v =
     map2 (,) (Just 0) (Just 'a') == Just (0, 'a')
 -}
 map2 : (a -> b -> c) -> Maybe a -> Maybe b -> Maybe c
-map2 f a b = map f a `ap` b
+map2 f a b = map f a `andMap` b
 
 {-|-}
 map3 : (a -> b -> c -> d) -> Maybe a -> Maybe b -> Maybe c -> Maybe d
-map3 f a b c = map f a `ap` b `ap` c
+map3 f a b c = map f a `andMap` b `andMap` c
 
 {-|-}
 map4 : (a -> b -> c -> d -> e) -> Maybe a -> Maybe b -> Maybe c -> Maybe d -> Maybe e
-map4 f a b c d = map f a `ap` b `ap` c `ap` d
+map4 f a b c d = map f a `andMap` b `andMap` c `andMap` d
 
 {-|-}
 map5 : (a -> b -> c -> d -> e -> f) -> Maybe a -> Maybe b -> Maybe c -> Maybe d -> Maybe e -> Maybe f
-map5 f a b c d e = map f a `ap` b `ap` c `ap` d `ap` e
-
-
-{-| Replace the value inside `Just` with a new value (possibly of a different type). Otherwise, return `Nothing`.
-
-Advanced functional programmers will recognize this as the implementation of `<$` for `Maybe`s from the `Functor` typeclass, where `<$ == map << always`.
--}
-mapReplaceBy : a -> Maybe b -> Maybe a
-mapReplaceBy = map << always
+map5 f a b c d e = map f a `andMap` b `andMap` c `andMap` d `andMap` e
 
 
 {-| Apply the function that is inside `Maybe` to a value that is inside `Maybe`. Return the result inside `Maybe`. If one of the `Maybe` arguments is `Nothing`, return `Nothing`.
 
-    Just ((+)2) `ap` Just 3 == Just 5
-    Just Nothing `ap` Just 3 == Nothing
-    Just ((+)2) `ap` Nothing == Nothing
+    Just ((+)2) `andMap` Just 3 == Just 5
+    Just Nothing `andMap` Just 3 == Nothing
+    Just ((+)2) `andMap` Nothing == Nothing
 
 Advanced functional programmers will recognize this as the implementation of `<*>` for `Maybe`s from the `Applicative` typeclass.
 -}
-ap : Maybe (a -> b) -> Maybe a -> Maybe b
-ap f x = x `andThen` (\x' -> f `andThen` (\f' -> Just <| f' x'))
+andMap : Maybe (a -> b) -> Maybe a -> Maybe b
+andMap f x = x `andThen` (\x' -> f `andThen` (\f' -> Just <| f' x'))
 
 
 {-| Take two `Maybe` values. If the first one equals `Nothing`, return `Nothing`. Otherwise return the second value.
@@ -254,14 +209,14 @@ traverse f =
     List.foldr step (Just [])
 
 
-{-| Take a list of `Maybe`s and return a `Maybe` with a list of values. `sequence == traverse identity`.
+{-| Take a list of `Maybe`s and return a `Maybe` with a list of values. `combine == traverse identity`.
 
-    sequence [] == Just []
-    sequence [Just 1, Just 2, Just 3] == Just [1,2,3]
-    sequence [Just 1, Nothing, Just 3] == Nothing
+    combine [] == Just []
+    combine [Just 1, Just 2, Just 3] == Just [1,2,3]
+    combine [Just 1, Nothing, Just 3] == Nothing
 -}
-sequence : List (Maybe a) -> Maybe (List a)
-sequence = traverse identity
+combine : List (Maybe a) -> Maybe (List a)
+combine = traverse identity
 
 
 {-|-}
@@ -277,5 +232,5 @@ traverseArray f =
 
 
 {-|-}
-sequenceArray : Array.Array (Maybe a) -> Maybe (Array.Array a)
-sequenceArray = traverseArray identity
+combineArray : Array.Array (Maybe a) -> Maybe (Array.Array a)
+combineArray = traverseArray identity
