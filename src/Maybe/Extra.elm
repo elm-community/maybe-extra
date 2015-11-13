@@ -29,7 +29,7 @@ import Maybe exposing (..)
     head [] ? 0 == 0
 -}
 (?) : Maybe a -> a -> a
-mx ? x = withDefault x mx
+(?) mx x = withDefault x mx
 
 {-| Flattens nested Maybes
 
