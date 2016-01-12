@@ -68,15 +68,14 @@ isJust m =
     Just _  -> True
 
 {-| Take a Maybe, a predicate and two values of Type b.
-    Return the first b is the `Maybe` if `Just` and the predicate evaluates to true.
-    Return the second b if the `Maybe` is `Nothing` or if the predicate evaluates to false.
+Return the first b is the `Maybe` if `Just` and the predicate evaluates to true.
+Return the second b if the `Maybe` is `Nothing` or if the predicate evaluates to false.
 -}
-maybeCondition : Maybe a -> (a -> Bool) -> b -> b -> b
+maybeCondition : Maybe a -> (a -> Bool) -> (a -> b) -> b -> b
 maybeCondition m f b1 b2 =
   case m of
-    Just a  -> if f a then b1 else b2
+    Just a  -> if f a then b1 a else b2
     Nothing -> b2
-
 
 {-| Combine two `Maybe`s with the given function. If one of the `Maybe`s is `Nothing`, the result is `Nothing`.
 
