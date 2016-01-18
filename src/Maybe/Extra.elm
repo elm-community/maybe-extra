@@ -9,7 +9,7 @@ module Maybe.Extra
 {-| Convenience functions for Maybe.
 
 # Common helpers
-@docs (?), join, isNothing, isJust, maybeCondition
+@docs (?), join, isNothing, isJust, mapDefault
 
 # Map
 @docs map2, map3, map4, map5
@@ -67,15 +67,13 @@ isJust m =
     Nothing -> False
     Just _  -> True
 
-{-| Take a Maybe, a predicate and two values of Type b.
-Return the first b is the `Maybe` if `Just` and the predicate evaluates to true.
-Return the second b if the `Maybe` is `Nothing` or if the predicate evaluates to false.
+{-| Take a default value, a function and a Maybe.
+Return the default value if the `Maybe` if `Nothing`.
+If the `Maybe` is `Just a`, apply the function on a and return the b.
 -}
-maybeCondition : Maybe a -> (a -> Bool) -> (a -> b) -> b -> b
-maybeCondition m f b1 b2 =
-  case m of
-    Just a  -> if f a then b1 a else b2
-    Nothing -> b2
+mapDefault : b -> (a -> b) -> Maybe a -> b
+mapDefault d f m =
+  Maybe.withDefault d (Maybe.map f m)
 
 {-| Combine two `Maybe`s with the given function. If one of the `Maybe`s is `Nothing`, the result is `Nothing`.
 
