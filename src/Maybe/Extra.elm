@@ -1,6 +1,6 @@
 module Maybe.Extra
   ( (?), join, isNothing, isJust
-  , map2, map3, map4, map5
+  , map2, map3, map4, map5, mapDefault
   , andMap, next, prev, or
   , maybeToList, maybeToArray
   , traverse, combine, traverseArray, combineArray
