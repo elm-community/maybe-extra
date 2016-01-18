@@ -9,7 +9,7 @@ module Maybe.Extra
 {-| Convenience functions for Maybe.
 
 # Common helpers
-@docs (?), join, isNothing, isJust
+@docs (?), join, isNothing, isJust, mapDefault
 
 # Map
 @docs map2, map3, map4, map5
@@ -67,6 +67,13 @@ isJust m =
     Nothing -> False
     Just _  -> True
 
+{-| Take a default value, a function and a Maybe.
+Return the default value if the `Maybe` if `Nothing`.
+If the `Maybe` is `Just a`, apply the function on a and return the b.
+-}
+mapDefault : b -> (a -> b) -> Maybe a -> b
+mapDefault d f m =
+  Maybe.withDefault d (Maybe.map f m)
 
 {-| Combine two `Maybe`s with the given function. If one of the `Maybe`s is `Nothing`, the result is `Nothing`.
 
