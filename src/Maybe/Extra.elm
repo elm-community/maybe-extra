@@ -67,9 +67,9 @@ isJust m =
     Nothing -> False
     Just _  -> True
 
-{-| Take a default value, a function and a Maybe.
-Return the default value if the `Maybe` if `Nothing`.
-If the `Maybe` is `Just a`, apply the function on a and return the b.
+{-| Take a default value, a function and a `Maybe`.
+Return the default value if the `Maybe` is `Nothing`.
+If the `Maybe` is `Just a`, apply the function on `a` and return the `b`.
 -}
 mapDefault : b -> (a -> b) -> Maybe a -> b
 mapDefault d f m =
