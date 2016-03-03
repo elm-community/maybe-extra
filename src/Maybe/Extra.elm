@@ -70,11 +70,14 @@ isJust m =
 {-| Take a default value, a function and a `Maybe`.
 Return the default value if the `Maybe` is `Nothing`.
 If the `Maybe` is `Just a`, apply the function on `a` and return the `b`.
+That is, `mapDefault d f` is equivalent to `Maybe.map f >> Maybe.withDefault d`.
 -}
 mapDefault : b -> (a -> b) -> Maybe a -> b
 mapDefault d f m =
-  Maybe.withDefault d (Maybe.map f m)
-
+  case m of
+    Nothing -> d
+    Just a  -> f a
+  
 {-| Combine two `Maybe`s with the given function. If one of the `Maybe`s is `Nothing`, the result is `Nothing`.
 
     map2 (+) (Just 1) (Just 2) == Just 3
