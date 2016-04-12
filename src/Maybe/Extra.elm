@@ -3,7 +3,7 @@ module Maybe.Extra
   , map2, map3, map4, map5, mapDefault
   , andMap, next, prev, or
   , maybeToList, maybeToArray
-  , traverse, combine, traverseArray, combineArray
+  , traverse, combine, traverseArray, combineArray, catMaybes
   ) where
 
 {-| Convenience functions for Maybe.
@@ -18,7 +18,7 @@ module Maybe.Extra
 @docs andMap, next, prev, or
 
 # List and array functions
-@docs maybeToList, maybeToArray, traverse, combine, traverseArray, combineArray
+@docs maybeToList, maybeToArray, traverse, combine, traverseArray, combineArray, catMaybes
 -}
 
 import Array
@@ -77,7 +77,7 @@ mapDefault d f m =
   case m of
     Nothing -> d
     Just a  -> f a
-  
+
 {-| Combine two `Maybe`s with the given function. If one of the `Maybe`s is `Nothing`, the result is `Nothing`.
 
     map2 (+) (Just 1) (Just 2) == Just 3
@@ -202,6 +202,17 @@ traverse f =
 -}
 combine : List (Maybe a) -> Maybe (List a)
 combine = traverse identity
+
+
+{-| Take a list of `Maybe`s and return a list of all the `Just` values. `catMaybes == List.filterMap identity`.
+
+    catMaybes [] == []
+    catMaybes [Just 1, Just 2, Just 3] == [1,2,3]
+    catMaybes [Just 1, Nothing, Just 3] == [1,3]
+    catMaybes [Nothing, Nothing, Nothing] == []
+-}
+catMaybes : List (Maybe a) -> List a
+catMaybes = List.filterMap identity
 
 
 {-|-}
