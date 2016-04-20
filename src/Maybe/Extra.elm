@@ -15,12 +15,13 @@ module Maybe.Extra
         , combine
         , traverseArray
         , combineArray
+        , filter
         )
 
 {-| Convenience functions for Maybe.
 
 # Common helpers
-@docs (?), join, isNothing, isJust, mapDefault
+@docs (?), join, isNothing, isJust, mapDefault, filter
 
 # Applicative functions
 @docs andMap, next, prev, or
@@ -245,3 +246,15 @@ traverseArray f =
 combineArray : Array.Array (Maybe a) -> Maybe (Array.Array a)
 combineArray =
     traverseArray identity
+
+
+{-| Take a `Maybe` and a predicate function and return a `Maybe` with the original value when a predicate matches.
+
+    filter (\v -> v == 1) (Just 1) == Just 1
+    filter (\v -> v == 2) (Just 1) == Nothing
+-}
+filter : (a -> Bool) -> Maybe a -> Maybe a
+filter f m =
+  case Maybe.map f m of
+    Just True -> m
+    _ -> Nothing
