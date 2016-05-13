@@ -1,10 +1,10 @@
-module Maybe.Extra
+module Maybe.Extra exposing
   ( (?), join, isNothing, isJust
   , map2, map3, map4, map5, mapDefault
   , andMap, next, prev, or
   , maybeToList, maybeToArray
   , traverse, combine, traverseArray, combineArray
-  ) where
+  )
 
 {-| Convenience functions for Maybe.
 
@@ -77,7 +77,7 @@ mapDefault d f m =
   case m of
     Nothing -> d
     Just a  -> f a
-  
+
 {-| Combine two `Maybe`s with the given function. If one of the `Maybe`s is `Nothing`, the result is `Nothing`.
 
     map2 (+) (Just 1) (Just 2) == Just 3
