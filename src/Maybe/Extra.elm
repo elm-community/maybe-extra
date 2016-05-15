@@ -4,10 +4,6 @@ module Maybe.Extra
         , join
         , isNothing
         , isJust
-        , map2
-        , map3
-        , map4
-        , map5
         , mapDefault
         , andMap
         , next
@@ -25,9 +21,6 @@ module Maybe.Extra
 
 # Common helpers
 @docs (?), join, isNothing, isJust, mapDefault
-
-# Map
-@docs map2, map3, map4, map5
 
 # Applicative functions
 @docs andMap, next, prev, or
@@ -110,34 +103,6 @@ mapDefault d f m =
 
         Just a ->
             f a
-
-
-{-| Combine two `Maybe`s with the given function. If one of the `Maybe`s is `Nothing`, the result is `Nothing`.
-
-    map2 (+) (Just 1) (Just 2) == Just 3
-    map2 (,) (Just 0) (Just 'a') == Just (0, 'a')
--}
-map2 : (a -> b -> c) -> Maybe a -> Maybe b -> Maybe c
-map2 f a b =
-    map f a `andMap` b
-
-
-{-| -}
-map3 : (a -> b -> c -> d) -> Maybe a -> Maybe b -> Maybe c -> Maybe d
-map3 f a b c =
-    map f a `andMap` b `andMap` c
-
-
-{-| -}
-map4 : (a -> b -> c -> d -> e) -> Maybe a -> Maybe b -> Maybe c -> Maybe d -> Maybe e
-map4 f a b c d =
-    map f a `andMap` b `andMap` c `andMap` d
-
-
-{-| -}
-map5 : (a -> b -> c -> d -> e -> f) -> Maybe a -> Maybe b -> Maybe c -> Maybe d -> Maybe e -> Maybe f
-map5 f a b c d e =
-    map f a `andMap` b `andMap` c `andMap` d `andMap` e
 
 
 {-| Apply the function that is inside `Maybe` to a value that is inside `Maybe`. Return the result inside `Maybe`. If one of the `Maybe` arguments is `Nothing`, return `Nothing`.
