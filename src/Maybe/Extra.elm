@@ -21,7 +21,7 @@ module Maybe.Extra
 {-| Convenience functions for Maybe.
 
 # Common helpers
-@docs (?), join, isNothing, isJust, mapDefault
+@docs (?), join, isNothing, isJust, mapDefault, filter
 
 # Applicative functions
 @docs andMap, next, prev, or
@@ -256,6 +256,8 @@ combineArray =
 filter : (a -> Bool) -> Maybe a -> Maybe a
 filter f m =
     case Maybe.map f m of
-      Just True -> m
-      _ -> Nothing
+        Just True ->
+            m
 
+        _ ->
+            Nothing
