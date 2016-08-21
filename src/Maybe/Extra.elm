@@ -9,6 +9,7 @@ module Maybe.Extra
         , next
         , prev
         , or
+        , orThen
         , maybeToList
         , maybeToArray
         , traverse
@@ -24,7 +25,7 @@ module Maybe.Extra
 @docs (?), join, isNothing, isJust, mapDefault, filter
 
 # Applicative functions
-@docs andMap, next, prev, or
+@docs andMap, next, prev, or, orThen
 
 # List and array functions
 @docs maybeToList, maybeToArray, traverse, combine, traverseArray, combineArray
@@ -165,6 +166,23 @@ or ma mb =
 
         Just _ ->
             ma
+
+
+{-|
+  If a `Maybe` is `Just`, return it, otherwise call a function to
+  produce another one. Useful for chaining together a series of
+  `Maybe`-producing functions when you want the first `Just`.
+
+    List.head []
+    |> orThen List.head [4]
+
+  This produces `Just 4`.
+-}
+orThen : (a -> Maybe b) -> a -> Maybe b -> Maybe b
+orThen f input m =
+    case m of
+        Just _ -> m
+        _ -> f input
 
 
 {-| Return an empty list on `Nothing` or a list with one element, where the element is the value of `Just`.
