@@ -9,6 +9,8 @@ module Maybe.Extra
         , next
         , prev
         , or
+        , orLazy
+        , orElseLazy
         , maybeToList
         , maybeToArray
         , traverse
@@ -24,7 +26,10 @@ module Maybe.Extra
 @docs (?), join, isNothing, isJust, mapDefault, filter
 
 # Applicative functions
-@docs andMap, next, prev, or
+@docs andMap, next, prev
+
+# Alternatives
+@docs or, orLazy, orElseLazy
 
 # List and array functions
 @docs maybeToList, maybeToArray, traverse, combine, traverseArray, combineArray
@@ -165,6 +170,35 @@ or ma mb =
 
         Just _ ->
             ma
+
+
+{-| Non-strict version of `or`. The second argument will only be
+evaluated if the first argument is `Nothing`.
+-}
+orLazy : Maybe a -> (() -> Maybe a) -> Maybe a
+orLazy ma fmb =
+    case ma of
+        Nothing ->
+            fmb ()
+
+        Just _ ->
+            ma
+
+
+{-| Piping-friendly version of `orLazy`. The first argument will only
+be evaluated if the second argument is `Nothing`. Example use:
+
+    List.head []
+    |> orElseLazy (\() -> List.head [4])
+-}
+orElseLazy : (() -> Maybe a) -> Maybe a -> Maybe a
+orElseLazy fma mb =
+    case mb of
+        Nothing ->
+            fma ()
+
+        Just _ ->
+            mb
 
 
 {-| Return an empty list on `Nothing` or a list with one element, where the element is the value of `Just`.
