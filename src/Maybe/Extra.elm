@@ -49,7 +49,7 @@ import Maybe exposing (..)
     withDefault x mx
 
 
-{-| Flattens nested Maybes
+{-| Flattens nested `Maybe`s
 
     join (Just (Just 1)) == Just 1
     join (Just Nothing)  == Nothing
@@ -151,17 +151,20 @@ prev =
     map2 always
 
 
-{-|
-  Like the boolean '||' this will return the first value that is positive ('Just').
+{-| Like the boolean `||` this will return the first value that is
+positive (`Just`). However, unlike with `||`, both values will be
+computed anyway (there is no short-circuiting).
 
     Just 4 `or` Just 5    == Just 4
     Just 4 `or` Nothing   == Just 4
     Nothing `or` Just 5   == Just 5
     Nothing `or` Nothing  == Nothing
 
-  This function sort of works like 'oneOf' but on single 'Maybe's.
+This function sort of works like `oneOf` but on single `Maybe`s.
 
-  Advanced functional programmers will recognize this as the implementation of 'mplus' for Maybes from the 'MonadPlus' Typeclass.
+Advanced functional programmers will recognize this as the
+implementation of `mplus` for `Maybe`s from the `MonadPlus` type
+class.
 -}
 or : Maybe a -> Maybe a -> Maybe a
 or ma mb =
