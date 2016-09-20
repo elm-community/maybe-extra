@@ -11,6 +11,7 @@ module Maybe.Extra
         , or
         , orLazy
         , orElseLazy
+        , orElse
         , maybeToList
         , maybeToArray
         , traverse
@@ -29,7 +30,7 @@ module Maybe.Extra
 @docs andMap, next, prev
 
 # Alternatives
-@docs or, orLazy, orElseLazy
+@docs or, orLazy, orElseLazy, orElse
 
 # List and array functions
 @docs maybeToList, maybeToArray, traverse, combine, traverseArray, combineArray
@@ -48,7 +49,7 @@ import Maybe exposing (..)
     withDefault x mx
 
 
-{-| Flattens nested Maybes
+{-| Flattens nested `Maybe`s
 
     join (Just (Just 1)) == Just 1
     join (Just Nothing)  == Nothing
@@ -150,17 +151,20 @@ prev =
     map2 always
 
 
-{-|
-  Like the boolean '||' this will return the first value that is positive ('Just').
+{-| Like the boolean `||` this will return the first value that is
+positive (`Just`). However, unlike with `||`, both values will be
+computed anyway (there is no short-circuiting).
 
     Just 4 `or` Just 5    == Just 4
     Just 4 `or` Nothing   == Just 4
     Nothing `or` Just 5   == Just 5
     Nothing `or` Nothing  == Nothing
 
-  This function sort of works like 'oneOf' but on single 'Maybe's.
+This function sort of works like `oneOf` but on single `Maybe`s.
 
-  Advanced functional programmers will recognize this as the implementation of 'mplus' for Maybes from the 'MonadPlus' Typeclass.
+Advanced functional programmers will recognize this as the
+implementation of `mplus` for `Maybe`s from the `MonadPlus` type
+class.
 -}
 or : Maybe a -> Maybe a -> Maybe a
 or ma mb =
@@ -196,6 +200,29 @@ orElseLazy fma mb =
     case mb of
         Nothing ->
             fma ()
+
+        Just _ ->
+            mb
+
+
+{-| Strict version of `orElseLazy` (and at the same time,
+piping-friendly version of `or`).
+
+    orElse (Just 4) (Just 5)  == Just 5  -- crucial difference from `or`
+    orElse (Just 4) Nothing   == Just 4
+    orElse Nothing  (Just 5)  == Just 5
+    orElse Nothing  Nothing   == Nothing
+
+Also:
+
+    List.head []
+    |> orElse (List.head [4])
+-}
+orElse : Maybe a -> Maybe a -> Maybe a
+orElse ma mb =
+    case mb of
+        Nothing ->
+            ma
 
         Just _ ->
             mb
