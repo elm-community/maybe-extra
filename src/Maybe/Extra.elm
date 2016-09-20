@@ -11,6 +11,7 @@ module Maybe.Extra
         , or
         , orLazy
         , orElseLazy
+        , orElse
         , maybeToList
         , maybeToArray
         , traverse
@@ -29,7 +30,7 @@ module Maybe.Extra
 @docs andMap, next, prev
 
 # Alternatives
-@docs or, orLazy, orElseLazy
+@docs or, orLazy, orElseLazy, orElse
 
 # List and array functions
 @docs maybeToList, maybeToArray, traverse, combine, traverseArray, combineArray
@@ -196,6 +197,29 @@ orElseLazy fma mb =
     case mb of
         Nothing ->
             fma ()
+
+        Just _ ->
+            mb
+
+
+{-| Strict version of `orElseLazy` (and at the same time,
+piping-friendly version of `or`).
+
+    orElse (Just 4) (Just 5)  == Just 5  -- crucial difference from `or`
+    orElse (Just 4) Nothing   == Just 4
+    orElse Nothing  (Just 5)  == Just 5
+    orElse Nothing  Nothing   == Nothing
+
+Also:
+
+    List.head []
+    |> orElse (List.head [4])
+-}
+orElse : Maybe a -> Maybe a -> Maybe a
+orElse ma mb =
+    case mb of
+        Nothing ->
+            ma
 
         Just _ ->
             mb
