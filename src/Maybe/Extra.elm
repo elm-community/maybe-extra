@@ -5,6 +5,7 @@ module Maybe.Extra
         , isNothing
         , isJust
         , unwrap
+        , unpack
         , andMap
         , next
         , prev
@@ -24,7 +25,7 @@ module Maybe.Extra
 {-| Convenience functions for Maybe.
 
 # Common helpers
-@docs (?), join, isNothing, isJust, unwrap, filter
+@docs (?), join, isNothing, isJust, unwrap, unpack, filter
 
 # Applicative functions
 @docs andMap, next, prev
@@ -107,6 +108,19 @@ unwrap d f m =
     case m of
         Nothing ->
             d
+
+        Just a ->
+            f a
+
+
+{-| A version of `unwrap` that is non-strict in the default value (by
+having it passed in a thunk).
+-}
+unpack : (() -> b) -> (a -> b) -> Maybe a -> b
+unpack d f m =
+    case m of
+        Nothing ->
+            d ()
 
         Just a ->
             f a
