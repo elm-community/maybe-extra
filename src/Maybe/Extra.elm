@@ -4,7 +4,7 @@ module Maybe.Extra
         , join
         , isNothing
         , isJust
-        , mapDefault
+        , unwrap
         , andMap
         , next
         , prev
@@ -24,7 +24,7 @@ module Maybe.Extra
 {-| Convenience functions for Maybe.
 
 # Common helpers
-@docs (?), join, isNothing, isJust, mapDefault, filter
+@docs (?), join, isNothing, isJust, unwrap, filter
 
 # Applicative functions
 @docs andMap, next, prev
@@ -100,10 +100,10 @@ isJust m =
 {-| Take a default value, a function and a `Maybe`.
 Return the default value if the `Maybe` is `Nothing`.
 If the `Maybe` is `Just a`, apply the function on `a` and return the `b`.
-That is, `mapDefault d f` is equivalent to `Maybe.map f >> Maybe.withDefault d`.
+That is, `unwrap d f` is equivalent to `Maybe.map f >> Maybe.withDefault d`.
 -}
-mapDefault : b -> (a -> b) -> Maybe a -> b
-mapDefault d f m =
+unwrap : b -> (a -> b) -> Maybe a -> b
+unwrap d f m =
     case m of
         Nothing ->
             d
