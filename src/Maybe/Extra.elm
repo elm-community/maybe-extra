@@ -128,15 +128,15 @@ unpack d f m =
 
 {-| Apply the function that is inside `Maybe` to a value that is inside `Maybe`. Return the result inside `Maybe`. If one of the `Maybe` arguments is `Nothing`, return `Nothing`.
 
-    Just ((+)2) `andMap` Just 3 == Just 5
-    Just Nothing `andMap` Just 3 == Nothing
-    Just ((+)2) `andMap` Nothing == Nothing
+    Just ((+) 2) |> andMap (Just 3) == Just 5
+    Nothing |> andMap (Just 3) == Nothing
+    Just ((+) 2) |> andMap Nothing == Nothing
 
 Advanced functional programmers will recognize this as the implementation of `<*>` for `Maybe`s from the `Applicative` typeclass.
 -}
-andMap : Maybe (a -> b) -> Maybe a -> Maybe b
-andMap f x =
-    x `andThen` (\x' -> f `andThen` (\f' -> Just <| f' x'))
+andMap : Maybe a -> Maybe (a -> b) -> Maybe b
+andMap =
+    Maybe.map2 (|>)
 
 
 {-| Take two `Maybe` values. If the first one equals `Nothing`, return `Nothing`. Otherwise return the second value.
