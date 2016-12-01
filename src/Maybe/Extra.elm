@@ -169,12 +169,10 @@ prev =
 positive (`Just`). However, unlike with `||`, both values will be
 computed anyway (there is no short-circuiting).
 
-    Just 4 `or` Just 5    == Just 4
-    Just 4 `or` Nothing   == Just 4
-    Nothing `or` Just 5   == Just 5
-    Nothing `or` Nothing  == Nothing
-
-This function sort of works like `oneOf` but on single `Maybe`s.
+    or (Just 4) (Just 5) == Just 4
+    or (Just 4) Nothing  == Just 4
+    or Nothing (Just 5)  == Just 5
+    or Nothing Nothing   == Nothing
 
 Advanced functional programmers will recognize this as the
 implementation of `mplus` for `Maybe`s from the `MonadPlus` type
