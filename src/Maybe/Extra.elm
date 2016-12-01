@@ -174,8 +174,6 @@ computed anyway (there is no short-circuiting).
     or Nothing (Just 5)  == Just 5
     or Nothing Nothing   == Nothing
 
-This function sort of works like `oneOf` but on single `Maybe`s.
-
 Advanced functional programmers will recognize this as the
 implementation of `mplus` for `Maybe`s from the `MonadPlus` type
 class.
