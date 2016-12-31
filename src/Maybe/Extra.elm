@@ -20,6 +20,7 @@ module Maybe.Extra
         , traverseArray
         , combineArray
         , filter
+        , values
         )
 
 {-| Convenience functions for Maybe.
@@ -34,7 +35,7 @@ module Maybe.Extra
 @docs or, orLazy, orElseLazy, orElse
 
 # List and array functions
-@docs maybeToList, maybeToArray, traverse, combine, traverseArray, combineArray
+@docs maybeToList, maybeToArray, traverse, combine, traverseArray, combineArray, values
 -}
 
 import Array
@@ -334,3 +335,23 @@ filter f m =
 
         _ ->
             Nothing
+
+
+{-| Convet a list of `Maybe a` to a list of `a` only for the values different
+from `Nothing`.
+
+    values [ Just 1, Nothing, Just 2 ] == [1, 2]
+-}
+values : List (Maybe a) -> List a
+values =
+    List.foldr foldrValues []
+
+
+foldrValues : Maybe a -> List a -> List a
+foldrValues item list =
+    case item of
+        Nothing ->
+            list
+
+        Just v ->
+            v :: list
