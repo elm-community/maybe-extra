@@ -13,8 +13,8 @@ module Maybe.Extra
         , orLazy
         , orElseLazy
         , orElse
-        , maybeToList
-        , maybeToArray
+        , toList
+        , toArray
         , traverse
         , combine
         , traverseArray
@@ -35,7 +35,7 @@ module Maybe.Extra
 @docs or, orLazy, orElseLazy, orElse
 
 # List and array functions
-@docs maybeToList, maybeToArray, traverse, combine, traverseArray, combineArray, values
+@docs toList, toArray, traverse, combine, traverseArray, combineArray, values
 -}
 
 import Array
@@ -243,11 +243,11 @@ orElse ma mb =
 
 {-| Return an empty list on `Nothing` or a list with one element, where the element is the value of `Just`.
 
-    maybeToList Nothing == []
-    maybeToList (Just 1) == [1]
+    toList Nothing == []
+    toList (Just 1) == [1]
 -}
-maybeToList : Maybe a -> List a
-maybeToList m =
+toList : Maybe a -> List a
+toList m =
     case m of
         Nothing ->
             []
@@ -258,12 +258,12 @@ maybeToList m =
 
 {-| Return an empty array on `Nothing` or a list with one element, where the element is the value of `Just`.
 
-    maybeToArray Nothing == Array.fromList []
-    maybeToArray (Just 1) == Array.fromList [1]
+    toArray Nothing == Array.fromList []
+    toArray (Just 1) == Array.fromList [1]
 
 -}
-maybeToArray : Maybe a -> Array.Array a
-maybeToArray m =
+toArray : Maybe a -> Array.Array a
+toArray m =
     case m of
         Nothing ->
             Array.empty
