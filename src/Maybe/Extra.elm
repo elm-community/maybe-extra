@@ -337,7 +337,7 @@ filter f m =
             Nothing
 
 
-{-| Convet a list of `Maybe a` to a list of `a` only for the values different
+{-| Convert a list of `Maybe a` to a list of `a` only for the values different
 from `Nothing`.
 
     values [ Just 1, Nothing, Just 2 ] == [1, 2]
