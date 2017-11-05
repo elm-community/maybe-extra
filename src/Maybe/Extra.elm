@@ -1,41 +1,51 @@
 module Maybe.Extra
     exposing
         ( (?)
-        , join
-        , isNothing
-        , isJust
-        , unwrap
-        , unpack
         , andMap
-        , next
-        , prev
-        , or
-        , orLazy
-        , orElseLazy
-        , orElse
-        , toList
-        , toArray
-        , traverse
         , combine
-        , traverseArray
         , combineArray
         , filter
+        , isJust
+        , isNothing
+        , join
+        , next
+        , oneOf
+        , or
+        , orElse
+        , orElseLazy
+        , orLazy
+        , prev
+        , toArray
+        , toList
+        , traverse
+        , traverseArray
+        , unpack
+        , unwrap
         , values
         )
 
 {-| Convenience functions for Maybe.
 
+
 # Common helpers
+
 @docs (?), join, isNothing, isJust, unwrap, unpack, filter
 
+
 # Applicative functions
+
 @docs andMap, next, prev
 
+
 # Alternatives
+
 @docs or, orLazy, orElseLazy, orElse
 
+
 # List and array functions
-@docs toList, toArray, traverse, combine, traverseArray, combineArray, values
+
+@docs toList, toArray, traverse, combine, traverseArray, combineArray, values, oneOf
+
 -}
 
 import Array
@@ -45,6 +55,7 @@ import Maybe exposing (..)
 {-| Flipped, infix version of `withDefault`.
 
     head [] ? 0 == 0
+
 -}
 (?) : Maybe a -> a -> a
 (?) mx x =
@@ -56,6 +67,7 @@ import Maybe exposing (..)
     join (Just (Just 1)) == Just 1
     join (Just Nothing)  == Nothing
     join Nothing         == Nothing
+
 -}
 join : Maybe (Maybe a) -> Maybe a
 join mx =
@@ -72,6 +84,7 @@ join mx =
     isNothing (Just 42) == False
     isNothing (Just []) == False
     isNothing Nothing   == True
+
 -}
 isNothing : Maybe a -> Bool
 isNothing m =
@@ -88,6 +101,7 @@ isNothing m =
     isJust (Just 42) == True
     isJust (Just []) == True
     isJust Nothing   == False
+
 -}
 isJust : Maybe a -> Bool
 isJust m =
@@ -134,6 +148,7 @@ unpack d f m =
     Just ((+) 2) |> andMap Nothing == Nothing
 
 Advanced functional programmers will recognize this as the implementation of `<*>` for `Maybe`s from the `Applicative` typeclass.
+
 -}
 andMap : Maybe a -> Maybe (a -> b) -> Maybe b
 andMap =
@@ -147,6 +162,7 @@ andMap =
     next (Just 1) Nothing == Nothing
 
 Advanced functional programmers will recognize this as the implementation of `*>` for `Maybe`s from the `Applicative` typeclass.
+
 -}
 next : Maybe a -> Maybe b -> Maybe b
 next =
@@ -160,6 +176,7 @@ next =
     prev (Just 1) Nothing == Nothing
 
 Advanced functional programmers will recognize this as the implementation of `<*` for `Maybe`s from the `Applicative` typeclass.
+
 -}
 prev : Maybe a -> Maybe b -> Maybe a
 prev =
@@ -178,6 +195,7 @@ computed anyway (there is no short-circuiting).
 Advanced functional programmers will recognize this as the
 implementation of `mplus` for `Maybe`s from the `MonadPlus` type
 class.
+
 -}
 or : Maybe a -> Maybe a -> Maybe a
 or ma mb =
@@ -207,6 +225,7 @@ be evaluated if the second argument is `Nothing`. Example use:
 
     List.head []
     |> orElseLazy (\() -> List.head [4])
+
 -}
 orElseLazy : (() -> Maybe a) -> Maybe a -> Maybe a
 orElseLazy fma mb =
@@ -230,6 +249,7 @@ Also:
 
     List.head []
     |> orElse (List.head [4])
+
 -}
 orElse : Maybe a -> Maybe a -> Maybe a
 orElse ma mb =
@@ -245,6 +265,7 @@ orElse ma mb =
 
     toList Nothing == []
     toList (Just 1) == [1]
+
 -}
 toList : Maybe a -> List a
 toList m =
@@ -275,6 +296,7 @@ toArray m =
 {-| Take a function that returns `Maybe` value and a list. Map a function over each element of the list. Collect the result in the list within `Maybe`.
 
     traverse (\x -> Just (x*10)) [1,2,3,4,5] == Just [10,20,30,40,50]
+
 -}
 traverse : (a -> Maybe b) -> List a -> Maybe (List b)
 traverse f =
@@ -287,7 +309,7 @@ traverse f =
                 Just x ->
                     map ((::) x) acc
     in
-        List.foldr step (Just [])
+    List.foldr step (Just [])
 
 
 {-| Take a list of `Maybe`s and return a `Maybe` with a list of values. `combine == traverse identity`.
@@ -295,6 +317,7 @@ traverse f =
     combine [] == Just []
     combine [Just 1, Just 2, Just 3] == Just [1,2,3]
     combine [Just 1, Nothing, Just 3] == Nothing
+
 -}
 combine : List (Maybe a) -> Maybe (List a)
 combine =
@@ -313,7 +336,7 @@ traverseArray f =
                 Just x ->
                     map (Array.push x) acc
     in
-        Array.foldl step (Just Array.empty)
+    Array.foldl step (Just Array.empty)
 
 
 {-| -}
@@ -326,6 +349,7 @@ combineArray =
 
     filter (\v -> v == 1) (Just 1) == Just 1
     filter (\v -> v == 2) (Just 1) == Nothing
+
 -}
 filter : (a -> Bool) -> Maybe a -> Maybe a
 filter f m =
@@ -341,6 +365,7 @@ filter f m =
 from `Nothing`.
 
     values [ Just 1, Nothing, Just 2 ] == [1, 2]
+
 -}
 values : List (Maybe a) -> List a
 values =
@@ -355,3 +380,25 @@ foldrValues item list =
 
         Just v ->
             v :: list
+
+
+{-| Get the first `Just a` in a `List` of `Maybe a`.
+
+    oneOf [ Just 4, Just 5 ] == Just 4
+    oneOf [ Just 4, Nothing ] == Nothing
+    oneOf [ Nothing, Just 5 ] == Just 5
+    oneOf [ Nothing, Nothing ] == Nothing
+    oneOf [] == Nothing
+
+-}
+oneOf : List (Maybe a) -> Maybe a
+oneOf maybes =
+    case maybes of
+        (Just a) :: _ ->
+            Just a
+
+        Nothing :: rest ->
+            oneOf rest
+
+        [] ->
+            Nothing
