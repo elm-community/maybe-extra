@@ -5,11 +5,11 @@ module Maybe.Extra
         , combine
         , combineArray
         , filter
+        , firstJust
         , isJust
         , isNothing
         , join
         , next
-        , oneOf
         , or
         , orElse
         , orElseLazy
@@ -44,7 +44,7 @@ module Maybe.Extra
 
 # List and array functions
 
-@docs toList, toArray, traverse, combine, traverseArray, combineArray, values, oneOf
+@docs toList, toArray, traverse, combine, traverseArray, combineArray, values, firstJust
 
 -}
 
@@ -384,21 +384,13 @@ foldrValues item list =
 
 {-| Get the first `Just a` in a `List` of `Maybe a`.
 
-    oneOf [ Just 4, Just 5 ] == Just 4
-    oneOf [ Just 4, Nothing ] == Nothing
-    oneOf [ Nothing, Just 5 ] == Just 5
-    oneOf [ Nothing, Nothing ] == Nothing
-    oneOf [] == Nothing
+    firstJust [ Just 4, Just 5 ] == Just 4
+    firstJust [ Just 4, Nothing ] == Nothing
+    firstJust [ Nothing, Just 5 ] == Just 5
+    firstJust [ Nothing, Nothing ] == Nothing
+    firstJust [] == Nothing
 
 -}
-oneOf : List (Maybe a) -> Maybe a
-oneOf maybes =
-    case maybes of
-        (Just a) :: _ ->
-            Just a
-
-        Nothing :: rest ->
-            oneOf rest
-
-        [] ->
-            Nothing
+firstJust : List (Maybe a) -> Maybe a
+firstJust =
+    List.foldr or Nothing
