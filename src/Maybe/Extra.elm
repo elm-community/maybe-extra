@@ -21,6 +21,7 @@ module Maybe.Extra
         , combineArray
         , filter
         , values
+        , firstJust
         )
 
 {-| Convenience functions for Maybe.
@@ -35,7 +36,7 @@ module Maybe.Extra
 @docs or, orLazy, orElseLazy, orElse
 
 # List and array functions
-@docs toList, toArray, traverse, combine, traverseArray, combineArray, values
+@docs toList, toArray, traverse, combine, traverseArray, combineArray, values, firstJust
 -}
 
 import Array
