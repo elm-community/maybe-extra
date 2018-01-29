@@ -355,3 +355,17 @@ foldrValues item list =
 
         Just v ->
             v :: list
+
+
+{-| Get the first `Just a` in a `List` of `Maybe a`.
+
+    firstJust [ Just 4, Just 5 ] == Just 4
+    firstJust [ Just 4, Nothing ] == Nothing
+    firstJust [ Nothing, Just 5 ] == Just 5
+    firstJust [ Nothing, Nothing ] == Nothing
+    firstJust [] == Nothing
+
+-}
+firstJust : List (Maybe a) -> Maybe a
+firstJust =
+    List.foldr or Nothing
