@@ -1,0 +1,15 @@
+{
+    "type": "package",
+    "name": "elm-community/maybe-extra",
+    "summary": "Convenience functions for working with Maybe",
+    "license": "MIT",
+    "version": "5.0.0",
+    "exposed-modules": [
+        "Maybe.Extra"
+    ],
+    "elm-version": "0.19.0 <= v < 0.20.0",
+    "dependencies": {
+        "elm/core": "1.0.0 <= v < 2.0.0"
+    },
+    "test-dependencies": {}
+}
