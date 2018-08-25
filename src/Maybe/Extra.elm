@@ -1,5 +1,5 @@
 module Maybe.Extra exposing
-    ( (?), join, isNothing, isJust, unwrap, unpack, filter
+    ( join, isNothing, isJust, unwrap, unpack, filter
     , andMap, next, prev
     , or, orLazy, orElseLazy, orElse
     , toList, toArray, traverse, combine, traverseArray, combineArray, values
@@ -31,16 +31,6 @@ module Maybe.Extra exposing
 
 import Array
 import Maybe exposing (..)
-
-
-{-| Flipped, infix version of `withDefault`.
-
-    head [] ? 0 == 0
-
--}
-(?) : Maybe a -> a -> a
-(?) mx x =
-    withDefault x mx
 
 
 {-| Flattens nested `Maybe`s
