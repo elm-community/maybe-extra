@@ -1,26 +1,9 @@
-module Maybe.Extra
-    exposing
-        ( andMap
-        , combine
-        , combineArray
-        , filter
-        , isJust
-        , isNothing
-        , join
-        , next
-        , or
-        , orElse
-        , orElseLazy
-        , orLazy
-        , prev
-        , toArray
-        , toList
-        , traverse
-        , traverseArray
-        , unpack
-        , unwrap
-        , values
-        )
+module Maybe.Extra exposing
+    ( join, isNothing, isJust, unwrap, unpack, filter
+    , andMap, next, prev
+    , or, orLazy, orElseLazy, orElse
+    , toList, toArray, traverse, combine, traverseArray, combineArray, values
+    )
 
 {-| Convenience functions for Maybe.
 
@@ -53,8 +36,10 @@ import Maybe exposing (..)
 {-| Flattens nested `Maybe`s
 
     join (Just (Just 1)) == Just 1
-    join (Just Nothing)  == Nothing
-    join Nothing         == Nothing
+
+    join (Just Nothing) == Nothing
+
+    join Nothing == Nothing
 
 -}
 join : Maybe (Maybe a) -> Maybe a
@@ -70,8 +55,10 @@ join mx =
 {-| Conveniently check if a `Maybe` matches `Nothing`.
 
     isNothing (Just 42) == False
+
     isNothing (Just []) == False
-    isNothing Nothing   == True
+
+    isNothing Nothing == True
 
 -}
 isNothing : Maybe a -> Bool
@@ -87,8 +74,10 @@ isNothing m =
 {-| Conveniently check if a `Maybe` matches `Just _`.
 
     isJust (Just 42) == True
+
     isJust (Just []) == True
-    isJust Nothing   == False
+
+    isJust Nothing == False
 
 -}
 isJust : Maybe a -> Bool
@@ -132,7 +121,9 @@ unpack d f m =
 {-| Apply the function that is inside `Maybe` to a value that is inside `Maybe`. Return the result inside `Maybe`. If one of the `Maybe` arguments is `Nothing`, return `Nothing`.
 
     Just ((+) 2) |> andMap (Just 3) == Just 5
+
     Nothing |> andMap (Just 3) == Nothing
+
     Just ((+) 2) |> andMap Nothing == Nothing
 
 Advanced functional programmers will recognize this as the implementation of `<*>` for `Maybe`s from the `Applicative` typeclass.
@@ -146,7 +137,9 @@ andMap =
 {-| Take two `Maybe` values. If the first one equals `Nothing`, return `Nothing`. Otherwise return the second value.
 
     next (Just 1) (Just 2) == Just 2
+
     next Nothing (Just 2) == Nothing
+
     next (Just 1) Nothing == Nothing
 
 Advanced functional programmers will recognize this as the implementation of `*>` for `Maybe`s from the `Applicative` typeclass.
@@ -160,7 +153,9 @@ next =
 {-| Take two `Maybe` values. If the second one equals `Nothing`, return `Nothing`. Otherwise return the first value.
 
     prev (Just 1) (Just 2) == Just 1
+
     prev Nothing (Just 2) == Nothing
+
     prev (Just 1) Nothing == Nothing
 
 Advanced functional programmers will recognize this as the implementation of `<*` for `Maybe`s from the `Applicative` typeclass.
@@ -176,9 +171,12 @@ positive (`Just`). However, unlike with `||`, both values will be
 computed anyway (there is no short-circuiting).
 
     or (Just 4) (Just 5) == Just 4
-    or (Just 4) Nothing  == Just 4
-    or Nothing (Just 5)  == Just 5
-    or Nothing Nothing   == Nothing
+
+    or (Just 4) Nothing == Just 4
+
+    or Nothing (Just 5) == Just 5
+
+    or Nothing Nothing == Nothing
 
 Advanced functional programmers will recognize this as the
 implementation of `mplus` for `Maybe`s from the `MonadPlus` type
@@ -212,7 +210,7 @@ orLazy ma fmb =
 be evaluated if the second argument is `Nothing`. Example use:
 
     List.head []
-    |> orElseLazy (\() -> List.head [4])
+        |> orElseLazy (\() -> List.head [ 4 ])
 
 -}
 orElseLazy : (() -> Maybe a) -> Maybe a -> Maybe a
@@ -228,15 +226,18 @@ orElseLazy fma mb =
 {-| Strict version of `orElseLazy` (and at the same time,
 piping-friendly version of `or`).
 
-    orElse (Just 4) (Just 5)  == Just 5  -- crucial difference from `or`
-    orElse (Just 4) Nothing   == Just 4
-    orElse Nothing  (Just 5)  == Just 5
-    orElse Nothing  Nothing   == Nothing
+    orElse (Just 4) (Just 5) == Just 5 -- crucial difference from `or`
+
+    orElse (Just 4) Nothing == Just 4
+
+    orElse Nothing (Just 5) == Just 5
+
+    orElse Nothing Nothing == Nothing
 
 Also:
 
     List.head []
-    |> orElse (List.head [4])
+        |> orElse (List.head [ 4 ])
 
 -}
 orElse : Maybe a -> Maybe a -> Maybe a
@@ -252,7 +253,8 @@ orElse ma mb =
 {-| Return an empty list on `Nothing` or a list with one element, where the element is the value of `Just`.
 
     toList Nothing == []
-    toList (Just 1) == [1]
+
+    toList (Just 1) == [ 1 ]
 
 -}
 toList : Maybe a -> List a
@@ -268,7 +270,8 @@ toList m =
 {-| Return an empty array on `Nothing` or a list with one element, where the element is the value of `Just`.
 
     toArray Nothing == Array.fromList []
-    toArray (Just 1) == Array.fromList [1]
+
+    toArray (Just 1) == Array.fromList [ 1 ]
 
 -}
 toArray : Maybe a -> Array.Array a
@@ -283,7 +286,7 @@ toArray m =
 
 {-| Take a function that returns `Maybe` value and a list. Map a function over each element of the list. Collect the result in the list within `Maybe`.
 
-    traverse (\x -> Just (x*10)) [1,2,3,4,5] == Just [10,20,30,40,50]
+    traverse (\x -> Just (x * 10)) [ 1, 2, 3, 4, 5 ] == Just [ 10, 20, 30, 40, 50 ]
 
 -}
 traverse : (a -> Maybe b) -> List a -> Maybe (List b)
@@ -303,8 +306,10 @@ traverse f =
 {-| Take a list of `Maybe`s and return a `Maybe` with a list of values. `combine == traverse identity`.
 
     combine [] == Just []
-    combine [Just 1, Just 2, Just 3] == Just [1,2,3]
-    combine [Just 1, Nothing, Just 3] == Nothing
+
+    combine [ Just 1, Just 2, Just 3 ] == Just [ 1, 2, 3 ]
+
+    combine [ Just 1, Nothing, Just 3 ] == Nothing
 
 -}
 combine : List (Maybe a) -> Maybe (List a)
@@ -336,6 +341,7 @@ combineArray =
 {-| Take a `Maybe` and a predicate function and return a `Maybe` with the original value when a predicate matches.
 
     filter (\v -> v == 1) (Just 1) == Just 1
+
     filter (\v -> v == 2) (Just 1) == Nothing
 
 -}
@@ -352,7 +358,7 @@ filter f m =
 {-| Convert a list of `Maybe a` to a list of `a` only for the values different
 from `Nothing`.
 
-    values [ Just 1, Nothing, Just 2 ] == [1, 2]
+    values [ Just 1, Nothing, Just 2 ] == [ 1, 2 ]
 
 -}
 values : List (Maybe a) -> List a
