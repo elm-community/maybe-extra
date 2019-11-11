@@ -1,13 +1,12 @@
-# Convenience functions for working with Maybe
-Experimental package with convenience functions for working with Maybe.
-Note that this API is experimental and likely to go through many more iterations.
+# Maybe.Extra
 
-Feedback and contributions are very welcome.
+Convenience functions for working with Maybe
 
 Contributing
 ------------
 
-Pull requests are welcome. If you want to talk to us, join us on the
+Pull requests and feature requests are welcome.
+If you want to talk to us, join us on the
 `#elm-community` channels on the [Elm Slack](https://elmlang.slack.com).
 
 License
