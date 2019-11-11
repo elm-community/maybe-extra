@@ -1,31 +1,47 @@
 module Maybe.Extra exposing
-    ( join, isNothing, isJust, unwrap, unpack, filter
+    ( isJust, isNothing, join, filter
+    , unwrap, unpack
+    , or, orElse, orLazy, orElseLazy
+    , values
+    , combine, traverse, combineArray, traverseArray
+    , toList, toArray
     , andMap, next, prev
-    , or, orLazy, orElseLazy, orElse
-    , toList, toArray, traverse, combine, traverseArray, combineArray, values
     )
 
-{-| Convenience functions for Maybe.
+{-| Convenience functions for `Maybe`.
 
 
-# Common helpers
+# Basics
 
-@docs join, isNothing, isJust, unwrap, unpack, filter
+Work with 1 `Maybe`
+
+@docs isJust, isNothing, join, filter
 
 
-# Applicative functions
+# Get a value out of a `Maybe`
+
+@docs unwrap, unpack
+
+
+# Or: Combine 2 `Maybe`s
+
+@docs or, orElse, orLazy, orElseLazy
+
+
+# Lists of `Maybe`s
+
+@docs values
+@docs combine, traverse, combineArray, traverseArray
+
+
+# toList
+
+@docs toList, toArray
+
+
+# Applicative Functions
 
 @docs andMap, next, prev
-
-
-# Alternatives
-
-@docs or, orLazy, orElseLazy, orElse
-
-
-# List and array functions
-
-@docs toList, toArray, traverse, combine, traverseArray, combineArray, values
 
 -}
 
@@ -33,26 +49,30 @@ import Array
 import Maybe exposing (..)
 
 
-{-| Flattens nested `Maybe`s
 
-    join (Just (Just 1))
-    --> Just 1
+-- Basics: Work with 1 `Maybe`
 
-    join (Just Nothing)
-    --> Nothing
 
-    join Nothing
-    --> Nothing
+{-| Conveniently check if a `Maybe` matches `Just _`.
+
+    isJust (Just 42)
+    --> True
+
+    isJust (Just [])
+    --> True
+
+    isJust Nothing
+    --> False
 
 -}
-join : Maybe (Maybe a) -> Maybe a
-join mx =
-    case mx of
-        Just x ->
-            x
-
+isJust : Maybe a -> Bool
+isJust m =
+    case m of
         Nothing ->
-            Nothing
+            False
+
+        Just _ ->
+            True
 
 
 {-| Conveniently check if a `Maybe` matches `Nothing`.
@@ -77,26 +97,49 @@ isNothing m =
             False
 
 
-{-| Conveniently check if a `Maybe` matches `Just _`.
+{-| Flattens nested `Maybe`s
 
-    isJust (Just 42)
-    --> True
+    join (Just (Just 1))
+    --> Just 1
 
-    isJust (Just [])
-    --> True
+    join (Just Nothing)
+    --> Nothing
 
-    isJust Nothing
-    --> False
+    join Nothing
+    --> Nothing
 
 -}
-isJust : Maybe a -> Bool
-isJust m =
-    case m of
-        Nothing ->
-            False
+join : Maybe (Maybe a) -> Maybe a
+join mx =
+    case mx of
+        Just x ->
+            x
 
-        Just _ ->
-            True
+        Nothing ->
+            Nothing
+
+
+{-| Take a `Maybe` and a predicate function and return a `Maybe` with the original value when a predicate matches.
+
+    filter (\v -> v == 1) (Just 1)
+    --> Just 1
+
+    filter (\v -> v == 2) (Just 1)
+    --> Nothing
+
+-}
+filter : (a -> Bool) -> Maybe a -> Maybe a
+filter f m =
+    case Maybe.map f m of
+        Just True ->
+            m
+
+        _ ->
+            Nothing
+
+
+
+-- Get a value out of a `Maybe`
 
 
 {-| Take a default value, a function and a `Maybe`.
@@ -141,61 +184,8 @@ unpack d f m =
             f a
 
 
-{-| Apply the function that is inside `Maybe` to a value that is inside `Maybe`. Return the result inside `Maybe`. If one of the `Maybe` arguments is `Nothing`, return `Nothing`.
 
-    Just ((+) 2) |> andMap (Just 3)
-    --> Just 5
-
-    Nothing |> andMap (Just 3)
-    --> Nothing
-
-    Just ((+) 2) |> andMap Nothing
-    --> Nothing
-
-Advanced functional programmers will recognize this as the implementation of `<*>` for `Maybe`s from the `Applicative` typeclass.
-
--}
-andMap : Maybe a -> Maybe (a -> b) -> Maybe b
-andMap =
-    Maybe.map2 (|>)
-
-
-{-| Take two `Maybe` values. If the first one equals `Nothing`, return `Nothing`. Otherwise return the second value.
-
-    next (Just 1) (Just 2)
-    --> Just 2
-
-    next Nothing (Just 2)
-    --> Nothing
-
-    next (Just 1) Nothing
-    --> Nothing
-
-Advanced functional programmers will recognize this as the implementation of `*>` for `Maybe`s from the `Applicative` typeclass.
-
--}
-next : Maybe a -> Maybe b -> Maybe b
-next =
-    map2 (\b a -> always a b)
-
-
-{-| Take two `Maybe` values. If the second one equals `Nothing`, return `Nothing`. Otherwise return the first value.
-
-    prev (Just 1) (Just 2)
-    --> Just 1
-
-    prev Nothing (Just 2)
-    --> Nothing
-
-    prev (Just 1) Nothing
-    --> Nothing
-
-Advanced functional programmers will recognize this as the implementation of `<*` for `Maybe`s from the `Applicative` typeclass.
-
--}
-prev : Maybe a -> Maybe b -> Maybe a
-prev =
-    map2 always
+-- Or: Combine 2 `Maybe`s
 
 
 {-| Like the boolean `||` this will return the first value that is
@@ -289,6 +279,99 @@ orElseLazy fma mb =
             mb
 
 
+
+-- Lists of `Maybe`s
+
+
+{-| Convert a list of `Maybe a` to a list of `a` only for the values different
+from `Nothing`.
+
+    values [ Just 1, Nothing, Just 2 ]
+    --> [ 1, 2 ]
+
+-}
+values : List (Maybe a) -> List a
+values =
+    List.foldr foldrValues []
+
+
+foldrValues : Maybe a -> List a -> List a
+foldrValues item list =
+    case item of
+        Nothing ->
+            list
+
+        Just v ->
+            v :: list
+
+
+{-| Take a list of `Maybe`s and return a `Maybe` with a list of values. `combine == traverse identity`.
+
+    combine []
+    --> Just []
+
+    combine [ Just 1, Just 2, Just 3 ]
+    --> Just [ 1, 2, 3 ]
+
+    combine [ Just 1, Nothing, Just 3 ]
+    --> Nothing
+
+-}
+combine : List (Maybe a) -> Maybe (List a)
+combine =
+    traverse identity
+
+
+{-| Take a function that returns `Maybe` value and a list. Map a function over each element of the list. Collect the result in the list within `Maybe`.
+
+    traverse (\x -> Just (x * 10)) [ 1, 2, 3, 4, 5 ]
+    --> Just [ 10, 20, 30, 40, 50 ]
+
+If any element returns Nothing, the whole function fails
+
+    traverse List.head [ [1], [2, 3], [] ]
+    --> Nothing
+
+-}
+traverse : (a -> Maybe b) -> List a -> Maybe (List b)
+traverse f =
+    let
+        step e acc =
+            case f e of
+                Nothing ->
+                    Nothing
+
+                Just x ->
+                    map ((::) x) acc
+    in
+    List.foldr step (Just [])
+
+
+{-| -}
+combineArray : Array.Array (Maybe a) -> Maybe (Array.Array a)
+combineArray =
+    traverseArray identity
+
+
+{-| -}
+traverseArray : (a -> Maybe b) -> Array.Array a -> Maybe (Array.Array b)
+traverseArray f =
+    let
+        step e acc =
+            case f e of
+                Nothing ->
+                    Nothing
+
+                Just x ->
+                    map (Array.push x) acc
+    in
+    Array.foldl step (Just Array.empty)
+
+
+
+-- toList
+
+
 {-| Return an empty list on `Nothing` or a list with one element, where the element is the value of `Just`.
 
     toList Nothing
@@ -329,105 +412,62 @@ toArray m =
             Array.repeat 1 x
 
 
-{-| Take a function that returns `Maybe` value and a list. Map a function over each element of the list. Collect the result in the list within `Maybe`.
 
-    traverse (\x -> Just (x * 10)) [ 1, 2, 3, 4, 5 ]
-    --> Just [ 10, 20, 30, 40, 50 ]
+-- Applicative Functions
 
-If any element returns Nothing, the whole function fails
 
-    traverse List.head [ [1], [2, 3], [] ]
+{-| Apply the function that is inside `Maybe` to a value that is inside `Maybe`. Return the result inside `Maybe`. If one of the `Maybe` arguments is `Nothing`, return `Nothing`.
+
+    Just ((+) 2) |> andMap (Just 3)
+    --> Just 5
+
+    Nothing |> andMap (Just 3)
     --> Nothing
 
--}
-traverse : (a -> Maybe b) -> List a -> Maybe (List b)
-traverse f =
-    let
-        step e acc =
-            case f e of
-                Nothing ->
-                    Nothing
-
-                Just x ->
-                    map ((::) x) acc
-    in
-    List.foldr step (Just [])
-
-
-{-| Take a list of `Maybe`s and return a `Maybe` with a list of values. `combine == traverse identity`.
-
-    combine []
-    --> Just []
-
-    combine [ Just 1, Just 2, Just 3 ]
-    --> Just [ 1, 2, 3 ]
-
-    combine [ Just 1, Nothing, Just 3 ]
+    Just ((+) 2) |> andMap Nothing
     --> Nothing
 
+Advanced functional programmers will recognize this as the implementation of `<*>` for `Maybe`s from the `Applicative` typeclass.
+
 -}
-combine : List (Maybe a) -> Maybe (List a)
-combine =
-    traverse identity
+andMap : Maybe a -> Maybe (a -> b) -> Maybe b
+andMap =
+    Maybe.map2 (|>)
 
 
-{-| -}
-traverseArray : (a -> Maybe b) -> Array.Array a -> Maybe (Array.Array b)
-traverseArray f =
-    let
-        step e acc =
-            case f e of
-                Nothing ->
-                    Nothing
+{-| Take two `Maybe` values. If the first one equals `Nothing`, return `Nothing`. Otherwise return the second value.
 
-                Just x ->
-                    map (Array.push x) acc
-    in
-    Array.foldl step (Just Array.empty)
+    next (Just 1) (Just 2)
+    --> Just 2
 
+    next Nothing (Just 2)
+    --> Nothing
 
-{-| -}
-combineArray : Array.Array (Maybe a) -> Maybe (Array.Array a)
-combineArray =
-    traverseArray identity
+    next (Just 1) Nothing
+    --> Nothing
+
+Advanced functional programmers will recognize this as the implementation of `*>` for `Maybe`s from the `Applicative` typeclass.
+
+-}
+next : Maybe a -> Maybe b -> Maybe b
+next =
+    map2 (\b a -> always a b)
 
 
-{-| Take a `Maybe` and a predicate function and return a `Maybe` with the original value when a predicate matches.
+{-| Take two `Maybe` values. If the second one equals `Nothing`, return `Nothing`. Otherwise return the first value.
 
-    filter (\v -> v == 1) (Just 1)
+    prev (Just 1) (Just 2)
     --> Just 1
 
-    filter (\v -> v == 2) (Just 1)
+    prev Nothing (Just 2)
     --> Nothing
 
--}
-filter : (a -> Bool) -> Maybe a -> Maybe a
-filter f m =
-    case Maybe.map f m of
-        Just True ->
-            m
+    prev (Just 1) Nothing
+    --> Nothing
 
-        _ ->
-            Nothing
-
-
-{-| Convert a list of `Maybe a` to a list of `a` only for the values different
-from `Nothing`.
-
-    values [ Just 1, Nothing, Just 2 ]
-    --> [ 1, 2 ]
+Advanced functional programmers will recognize this as the implementation of `<*` for `Maybe`s from the `Applicative` typeclass.
 
 -}
-values : List (Maybe a) -> List a
-values =
-    List.foldr foldrValues []
-
-
-foldrValues : Maybe a -> List a -> List a
-foldrValues item list =
-    case item of
-        Nothing ->
-            list
-
-        Just v ->
-            v :: list
+prev : Maybe a -> Maybe b -> Maybe a
+prev =
+    map2 always
