@@ -299,17 +299,16 @@ Equivalent to `List.filterMap identity`.
 -}
 values : List (Maybe a) -> List a
 values =
-    List.foldr foldrValues []
+    let
+        step maybe acc =
+            case maybe of
+                Nothing ->
+                    acc
 
-
-foldrValues : Maybe a -> List a -> List a
-foldrValues item list =
-    case item of
-        Nothing ->
-            list
-
-        Just v ->
-            v :: list
+                Just x ->
+                    x :: acc
+    in
+    List.foldr step []
 
 
 {-| If every `Maybe` in the list is present, return all of the values unwrapped.
@@ -327,7 +326,7 @@ If there are any `Nothing`s, the whole function fails and returns `Nothing`.
 -}
 combine : List (Maybe a) -> Maybe (List a)
 combine =
-    traverse identity
+    List.foldr (map2 (::)) (Just [])
 
 
 {-| Like `combine`, but map a function over each element of the list first.
@@ -346,37 +345,19 @@ If any function call fails (returns `Nothing`), `traverse` will return `Nothing`
 -}
 traverse : (a -> Maybe b) -> List a -> Maybe (List b)
 traverse f =
-    let
-        step e acc =
-            case f e of
-                Nothing ->
-                    Nothing
-
-                Just x ->
-                    map ((::) x) acc
-    in
-    List.foldr step (Just [])
+    List.foldr (\x -> map2 (::) (f x)) (Just [])
 
 
 {-| -}
 combineArray : Array.Array (Maybe a) -> Maybe (Array.Array a)
 combineArray =
-    traverseArray identity
+    Array.foldl (map2 Array.push) (Just Array.empty)
 
 
 {-| -}
 traverseArray : (a -> Maybe b) -> Array.Array a -> Maybe (Array.Array b)
 traverseArray f =
-    let
-        step e acc =
-            case f e of
-                Nothing ->
-                    Nothing
-
-                Just x ->
-                    map (Array.push x) acc
-    in
-    Array.foldl step (Just Array.empty)
+    Array.foldl (\x -> map2 Array.push (f x)) (Just Array.empty)
 
 
 

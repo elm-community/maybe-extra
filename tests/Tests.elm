@@ -72,7 +72,12 @@ suite =
                         |> Expect.equal Nothing
             ]
         , describe "traverseArray"
-            [ test "all Just" <|
+            [ test "empty" <|
+                \() ->
+                    Array.empty
+                        |> traverseArray (\x -> Just (x * 10))
+                        |> Expect.equal (Just Array.empty)
+            , test "all Just" <|
                 \() ->
                     [ 1, 2, 3, 4, 5 ]
                         |> Array.fromList
@@ -88,7 +93,8 @@ suite =
         , describe "combineArray"
             [ test "empty" <|
                 \() ->
-                    combineArray Array.empty
+                    Array.empty
+                        |> combineArray
                         |> Expect.equal (Just Array.empty)
             , test "succeed" <|
                 \() ->
