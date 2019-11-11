@@ -1,8 +1,8 @@
 {
   "name": "maybe-extra",
   "scripts": {
-    "format": "elm-format src",
-    "test:format": "elm-format --validate src",
+    "format": "elm-format --yes src tests/Tests.elm",
+    "test:format": "elm-format --validate src tests/Tests.elm",
     "test": "elm-verify-examples && elm-test && npm run test:format"
   },
   "dependencies": {
