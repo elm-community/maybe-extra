@@ -53,7 +53,7 @@ import Maybe exposing (..)
 -- Basics: Work with 1 `Maybe`
 
 
-{-| Conveniently check if a `Maybe` matches `Just _`.
+{-|
 
     isJust (Just 42)
     --> True
@@ -75,7 +75,7 @@ isJust m =
             True
 
 
-{-| Conveniently check if a `Maybe` matches `Nothing`.
+{-|
 
     isNothing (Just 42)
     --> False
@@ -119,12 +119,15 @@ join mx =
             Nothing
 
 
-{-| Take a `Maybe` and a predicate function and return a `Maybe` with the original value when a predicate matches.
+{-| Keep the `Maybe` only if the predicate function passes
 
     filter (\v -> v == 1) (Just 1)
     --> Just 1
 
     filter (\v -> v == 2) (Just 1)
+    --> Nothing
+
+    filter (\v -> v == 1) Nothing
     --> Nothing
 
 -}
@@ -142,10 +145,10 @@ filter f m =
 -- Get a value out of a `Maybe`
 
 
-{-| Take a default value, a function and a `Maybe`.
-Return the default value if the `Maybe` is `Nothing`.
-If the `Maybe` is `Just a`, apply the function on `a` and return the `b`.
-That is, `unwrap d f` is equivalent to `Maybe.map f >> Maybe.withDefault d`.
+{-| Apply the function to the value in the `Maybe` and return it unwrapped.
+If the `Maybe` is `Nothing`, use the default value instead.
+
+`unwrap default f` is equivalent to `Maybe.map f >> Maybe.withDefault default`.
 
     unwrap 0 String.length Nothing
     --> 0
@@ -155,17 +158,17 @@ That is, `unwrap d f` is equivalent to `Maybe.map f >> Maybe.withDefault d`.
 
 -}
 unwrap : b -> (a -> b) -> Maybe a -> b
-unwrap d f m =
+unwrap default f m =
     case m of
         Nothing ->
-            d
+            default
 
         Just a ->
             f a
 
 
-{-| A version of `unwrap` that is non-strict in the default value (by
-having it passed in a thunk).
+{-| `unpack`, but the default value is lazy,
+and will only be computed if the `Maybe` is `Nothing`.
 
     unpack (\() -> 0) String.length Nothing
     --> 0
@@ -175,10 +178,10 @@ having it passed in a thunk).
 
 -}
 unpack : (() -> b) -> (a -> b) -> Maybe a -> b
-unpack d f m =
+unpack default f m =
     case m of
         Nothing ->
-            d ()
+            default ()
 
         Just a ->
             f a
@@ -188,9 +191,10 @@ unpack d f m =
 -- Or: Combine 2 `Maybe`s
 
 
-{-| Like the boolean `||` this will return the first value that is
-positive (`Just`). However, unlike with `||`, both values will be
-computed anyway (there is no short-circuiting).
+{-| Returns the first value that is present, like the boolean `||`.
+
+Both values will be computed. There is no short-circuiting.
+If your second argument is expensive to calculate and you need short circuiting, use `orLazy` instead.
 
     or (Just 4) (Just 5)
     --> Just 4
@@ -244,6 +248,7 @@ orElse ma mb =
 
 
 {-| Lazy version of `or`.
+
 The second argument will only be evaluated if the first argument is `Nothing`.
 
     orLazy (Just 4) (\() -> Just 5)
@@ -261,8 +266,9 @@ orLazy ma fmb =
 
 
 {-| Lazy version of `orElse`.
+Piping-friendly version of `orLazy`.
+
 The first argument will only be evaluated if the second argument is `Nothing`.
-Piping-friendly.
 
     List.head []
         |> orElseLazy (\() -> List.head [ 4 ])
@@ -283,8 +289,9 @@ orElseLazy fma mb =
 -- Lists of `Maybe`s
 
 
-{-| Convert a list of `Maybe a` to a list of `a` only for the values different
-from `Nothing`.
+{-| Take all the values that are present, throwing away any `Nothing`s.
+
+Equivalent to `List.filterMap identity`.
 
     values [ Just 1, Nothing, Just 2 ]
     --> [ 1, 2 ]
@@ -305,7 +312,8 @@ foldrValues item list =
             v :: list
 
 
-{-| Take a list of `Maybe`s and return a `Maybe` with a list of values. `combine == traverse identity`.
+{-| If every `Maybe` in the list is present, return all of the values unwrapped.
+If there are any `Nothing`s, the whole function fails and returns `Nothing`.
 
     combine []
     --> Just []
@@ -322,12 +330,15 @@ combine =
     traverse identity
 
 
-{-| Take a function that returns `Maybe` value and a list. Map a function over each element of the list. Collect the result in the list within `Maybe`.
+{-| Like `combine`, but map a function over each element of the list first.
+
+If every function call succeeds (returns `Just`), `traverse` will return a list.
+If any function call fails (returns `Nothing`), `traverse` will return `Nothing`.
+
+`combine` is equivalent to `traverse identity`.
 
     traverse (\x -> Just (x * 10)) [ 1, 2, 3, 4, 5 ]
     --> Just [ 10, 20, 30, 40, 50 ]
-
-If any element returns Nothing, the whole function fails
 
     traverse List.head [ [1], [2, 3], [] ]
     --> Nothing
@@ -372,7 +383,9 @@ traverseArray f =
 -- toList
 
 
-{-| Return an empty list on `Nothing` or a list with one element, where the element is the value of `Just`.
+{-| A `Maybe` is a lot like a list that can only be length 0 or 1.
+
+Returns a singleton list if the value is present, and an empty list it's missing.
 
     toList Nothing
     --> []
@@ -391,7 +404,7 @@ toList m =
             [ x ]
 
 
-{-| Return an empty array on `Nothing` or a list with one element, where the element is the value of `Just`.
+{-| Like `toList`, but returns a singleton or empty `Array`.
 
     import Array
 
@@ -416,15 +429,19 @@ toArray m =
 -- Applicative Functions
 
 
-{-| Apply the function that is inside `Maybe` to a value that is inside `Maybe`. Return the result inside `Maybe`. If one of the `Maybe` arguments is `Nothing`, return `Nothing`.
+{-| If both a function and a value are present, apply the function to the value.
+If either argument is `Nothing`, return `Nothing`.
 
-    Just ((+) 2) |> andMap (Just 3)
+    Just ((+) 2)
+        |> andMap (Just 3)
     --> Just 5
 
-    Nothing |> andMap (Just 3)
+    Nothing
+        |> andMap (Just 3)
     --> Nothing
 
-    Just ((+) 2) |> andMap Nothing
+    Just ((+) 2)
+        |> andMap Nothing
     --> Nothing
 
 Advanced functional programmers will recognize this as the implementation of `<*>` for `Maybe`s from the `Applicative` typeclass.
