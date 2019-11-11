@@ -103,6 +103,13 @@ isJust m =
 Return the default value if the `Maybe` is `Nothing`.
 If the `Maybe` is `Just a`, apply the function on `a` and return the `b`.
 That is, `unwrap d f` is equivalent to `Maybe.map f >> Maybe.withDefault d`.
+
+    unwrap 0 String.length Nothing
+    --> 0
+
+    unwrap 0 String.length (Just "abc")
+    --> 3
+
 -}
 unwrap : b -> (a -> b) -> Maybe a -> b
 unwrap d f m =
@@ -116,6 +123,13 @@ unwrap d f m =
 
 {-| A version of `unwrap` that is non-strict in the default value (by
 having it passed in a thunk).
+
+    unpack (\() -> 0) String.length Nothing
+    --> 0
+
+    unpack (\() -> 0) String.length (Just "abc")
+    --> 3
+
 -}
 unpack : (() -> b) -> (a -> b) -> Maybe a -> b
 unpack d f m =
@@ -217,6 +231,10 @@ or ma mb =
 
 {-| Non-strict version of `or`. The second argument will only be
 evaluated if the first argument is `Nothing`.
+
+    orLazy (Just 4) (\() -> Just 5)
+    --> Just 4
+
 -}
 orLazy : Maybe a -> (() -> Maybe a) -> Maybe a
 orLazy ma fmb =
@@ -233,6 +251,7 @@ be evaluated if the second argument is `Nothing`. Example use:
 
     List.head []
         |> orElseLazy (\() -> List.head [ 4 ])
+    --> Just 4
 
 -}
 orElseLazy : (() -> Maybe a) -> Maybe a -> Maybe a
@@ -248,23 +267,16 @@ orElseLazy fma mb =
 {-| Strict version of `orElseLazy` (and at the same time,
 piping-friendly version of `or`).
 
-    -- crucial difference from `or`
+    Just 5
+        |> orElse (Just 4)
+    --> Just 5
+
     orElse (Just 4) (Just 5)
     --> Just 5
 
-    orElse (Just 4) Nothing
-    --> Just 4
-
-    orElse Nothing (Just 5)
-    --> Just 5
-
-    orElse Nothing Nothing
-    --> Nothing
-
-Also:
-
     List.head []
         |> orElse (List.head [ 4 ])
+    --> Just 4
 
 -}
 orElse : Maybe a -> Maybe a -> Maybe a
@@ -321,6 +333,11 @@ toArray m =
 
     traverse (\x -> Just (x * 10)) [ 1, 2, 3, 4, 5 ]
     --> Just [ 10, 20, 30, 40, 50 ]
+
+If any element returns Nothing, the whole function fails
+
+    traverse List.head [ [1], [2, 3], [] ]
+    --> Nothing
 
 -}
 traverse : (a -> Maybe b) -> List a -> Maybe (List b)

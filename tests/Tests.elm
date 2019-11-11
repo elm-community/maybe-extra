@@ -1,13 +1,106 @@
 module Tests exposing (suite)
 
+import Array
 import Expect
+import Maybe.Extra exposing (..)
 import Test exposing (..)
 
 
 suite : Test
 suite =
     describe "Maybe.Extra"
-        [ test "placeholder" <|
-            \() ->
-                Expect.pass
+        [ describe "orElse"
+            [ test "both Just" <|
+                \() ->
+                    Just 4
+                        |> orElse (Just 5)
+                        |> Expect.equal (Just 4)
+            , test "pipe input Nothing" <|
+                \() ->
+                    Nothing
+                        |> orElse (Just 5)
+                        |> Expect.equal (Just 5)
+            , test "pipe function Nothing" <|
+                \() ->
+                    Just 4
+                        |> orElse Nothing
+                        |> Expect.equal (Just 4)
+            , test "both Nothing" <|
+                \() ->
+                    Nothing
+                        |> orElse Nothing
+                        |> Expect.equal Nothing
+            ]
+        , describe "orLazy"
+            [ test "both Just" <|
+                \() ->
+                    orLazy (Just 4) (\() -> Just 5)
+                        |> Expect.equal (Just 4)
+            , test "first Nothing" <|
+                \() ->
+                    orLazy Nothing (\() -> Just 5)
+                        |> Expect.equal (Just 5)
+            , test "second Nothing" <|
+                \() ->
+                    orLazy (Just 4) (\() -> Nothing)
+                        |> Expect.equal (Just 4)
+            , test "both Nothing" <|
+                \() ->
+                    orLazy Nothing (\() -> Nothing)
+                        |> Expect.equal Nothing
+            ]
+        , describe "orElseLazy"
+            [ test "both Just" <|
+                \() ->
+                    Just 4
+                        |> orElseLazy (\() -> Just 5)
+                        |> Expect.equal (Just 4)
+            , test "pipe input Nothing" <|
+                \() ->
+                    Nothing
+                        |> orElseLazy (\() -> Just 5)
+                        |> Expect.equal (Just 5)
+            , test "pipe function Nothing" <|
+                \() ->
+                    Just 4
+                        |> orElseLazy (\() -> Nothing)
+                        |> Expect.equal (Just 4)
+            , test "both Nothing" <|
+                \() ->
+                    Nothing
+                        |> orElseLazy (\() -> Nothing)
+                        |> Expect.equal Nothing
+            ]
+        , describe "traverseArray"
+            [ test "all Just" <|
+                \() ->
+                    [ 1, 2, 3, 4, 5 ]
+                        |> Array.fromList
+                        |> traverseArray (\x -> Just (x * 10))
+                        |> Expect.equal (Just (Array.fromList [ 10, 20, 30, 40, 50 ]))
+            , test "one Nothing fails the whole function" <|
+                \() ->
+                    [ [ 1 ], [ 2, 3 ], [] ]
+                        |> Array.fromList
+                        |> traverseArray List.head
+                        |> Expect.equal Nothing
+            ]
+        , describe "combineArray"
+            [ test "empty" <|
+                \() ->
+                    combineArray Array.empty
+                        |> Expect.equal (Just Array.empty)
+            , test "succeed" <|
+                \() ->
+                    [ Just 1, Just 2, Just 3 ]
+                        |> Array.fromList
+                        |> combineArray
+                        |> Expect.equal (Just (Array.fromList [ 1, 2, 3 ]))
+            , test "fail" <|
+                \() ->
+                    [ Just 1, Nothing ]
+                        |> Array.fromList
+                        |> combineArray
+                        |> Expect.equal Nothing
+            ]
         ]
