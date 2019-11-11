@@ -5,6 +5,7 @@ module Maybe.Extra exposing
     , values
     , combine, traverse, combineArray, traverseArray
     , toList, toArray
+    , cons
     , andMap, next, prev
     )
 
@@ -37,6 +38,7 @@ Work with 1 `Maybe`
 # toList
 
 @docs toList, toArray
+@docs cons
 
 
 # Applicative Functions
@@ -299,16 +301,7 @@ Equivalent to `List.filterMap identity`.
 -}
 values : List (Maybe a) -> List a
 values =
-    let
-        step maybe acc =
-            case maybe of
-                Nothing ->
-                    acc
-
-                Just x ->
-                    x :: acc
-    in
-    List.foldr step []
+    List.foldr cons []
 
 
 {-| If every `Maybe` in the list is present, return all of the values unwrapped.
@@ -404,6 +397,25 @@ toArray m =
 
         Just x ->
             Array.repeat 1 x
+
+
+{-| Add an item to a list only if it's a `Just`.
+
+    cons (Just 1) [ 2, 3 ]
+    --> [ 1, 2, 3 ]
+
+    cons Nothing [2, 3 ]
+    --> [ 2, 3 ]
+
+-}
+cons : Maybe a -> List a -> List a
+cons item list =
+    case item of
+        Just v ->
+            v :: list
+
+        Nothing ->
+            list
 
 
 
