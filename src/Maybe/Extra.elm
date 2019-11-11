@@ -229,43 +229,7 @@ or ma mb =
             ma
 
 
-{-| Non-strict version of `or`. The second argument will only be
-evaluated if the first argument is `Nothing`.
-
-    orLazy (Just 4) (\() -> Just 5)
-    --> Just 4
-
--}
-orLazy : Maybe a -> (() -> Maybe a) -> Maybe a
-orLazy ma fmb =
-    case ma of
-        Nothing ->
-            fmb ()
-
-        Just _ ->
-            ma
-
-
-{-| Piping-friendly version of `orLazy`. The first argument will only
-be evaluated if the second argument is `Nothing`. Example use:
-
-    List.head []
-        |> orElseLazy (\() -> List.head [ 4 ])
-    --> Just 4
-
--}
-orElseLazy : (() -> Maybe a) -> Maybe a -> Maybe a
-orElseLazy fma mb =
-    case mb of
-        Nothing ->
-            fma ()
-
-        Just _ ->
-            mb
-
-
-{-| Strict version of `orElseLazy` (and at the same time,
-piping-friendly version of `or`).
+{-| Piping-friendly version of `or`.
 
     Just 5
         |> orElse (Just 4)
@@ -284,6 +248,42 @@ orElse ma mb =
     case mb of
         Nothing ->
             ma
+
+        Just _ ->
+            mb
+
+
+{-| Lazy version of `or`.
+The second argument will only be evaluated if the first argument is `Nothing`.
+
+    orLazy (Just 4) (\() -> Just 5)
+    --> Just 4
+
+-}
+orLazy : Maybe a -> (() -> Maybe a) -> Maybe a
+orLazy ma fmb =
+    case ma of
+        Nothing ->
+            fmb ()
+
+        Just _ ->
+            ma
+
+
+{-| Lazy version of `orElse`.
+The first argument will only be evaluated if the second argument is `Nothing`.
+Piping-friendly.
+
+    List.head []
+        |> orElseLazy (\() -> List.head [ 4 ])
+    --> Just 4
+
+-}
+orElseLazy : (() -> Maybe a) -> Maybe a -> Maybe a
+orElseLazy fma mb =
+    case mb of
+        Nothing ->
+            fma ()
 
         Just _ ->
             mb
