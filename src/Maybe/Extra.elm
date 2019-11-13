@@ -6,7 +6,7 @@ module Maybe.Extra exposing
     , combine, traverse, combineArray, traverseArray
     , toList, toArray
     , cons
-    , andMap, next, prev
+    , andMap, next, prev, oneOf
     )
 
 {-| Convenience functions for [`Maybe`](https://package.elm-lang.org/packages/elm/core/latest/Maybe).
@@ -45,7 +45,7 @@ Take the first value that's present
 
 # Applicative Functions
 
-@docs andMap, next, prev
+@docs andMap, next, prev, oneOf
 
 -}
 
@@ -549,3 +549,34 @@ Advanced functional programmers will recognize this as the implementation of `<*
 prev : Maybe a -> Maybe b -> Maybe a
 prev =
     map2 always
+
+
+{-| Try a list of functions against a value. Return the value of the first call that succeeds (returns `Just`).
+
+    type UserInput
+        = FloatInput Float
+        | IntInput Int
+        | UnknownInput
+
+    "5.6"
+        |> oneOf
+            [ String.toInt >> Maybe.map IntInput
+            , String.toFloat >> Maybe.map FloatInput
+            ]
+        |> Maybe.withDefault UnknownInput
+    --> FloatInput 5.6
+
+-}
+oneOf : List (a -> Maybe b) -> a -> Maybe b
+oneOf fmbs a =
+    case fmbs of
+        [] ->
+            Nothing
+
+        fmb :: rest ->
+            case fmb a of
+                Just b ->
+                    Just b
+
+                Nothing ->
+                    oneOf rest a

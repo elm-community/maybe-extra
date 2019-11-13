@@ -124,4 +124,23 @@ suite =
                         |> combineArray
                         |> Expect.equal Nothing
             ]
+        , describe "oneOf"
+            [ test "empty" <|
+                \() ->
+                    oneOf [] 0
+                        |> Expect.equal Nothing
+            , test "all fail" <|
+                \() ->
+                    oneOf (List.repeat 10 (always Nothing)) 0
+                        |> Expect.equal Nothing
+            , test "last function succeeds" <|
+                \() ->
+                    oneOf [ always Nothing, always Nothing, always Nothing, always (Just True) ] 0
+                        |> Expect.equal (Just True)
+            , test "first function succeeds" <|
+                \() ->
+                    0
+                        |> oneOf [ Just, Just << (+) 10, Just << (+) 20 ]
+                        |> Expect.equal (Just 0)
+            ]
         ]
