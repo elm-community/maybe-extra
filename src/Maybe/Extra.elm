@@ -9,7 +9,7 @@ module Maybe.Extra exposing
     , andMap, next, prev
     )
 
-{-| Convenience functions for `Maybe`.
+{-| Convenience functions for [`Maybe`](https://package.elm-lang.org/packages/elm/core/latest/Maybe).
 
 
 # Basics
@@ -171,7 +171,7 @@ unwrap default f m =
             f a
 
 
-{-| `unpack`, but the default value is lazy,
+{-| Like [`unwrap`](#unwrap), but the default value is lazy,
 and will only be computed if the `Maybe` is `Nothing`.
 
     unpack (\() -> 0) String.length Nothing
@@ -198,7 +198,7 @@ unpack default f m =
 {-| Returns the first value that is present, like the boolean `||`.
 
 Both values will be computed. There is no short-circuiting.
-If your second argument is expensive to calculate and you need short circuiting, use `orLazy` instead.
+If your second argument is expensive to calculate and you need short circuiting, use [`orLazy`](#orLazy) instead.
 
     or (Just 4) (Just 5)
     --> Just 4
@@ -227,7 +227,7 @@ or ma mb =
             ma
 
 
-{-| Piping-friendly version of `or`.
+{-| Piping-friendly version of [`or`](#or).
 
     Just 5
         |> orElse (Just 4)
@@ -254,7 +254,7 @@ orElse ma mb =
 {-| Returns the first value that is present.
 
 All values will be computed.
-If your arguments are expensive to calculate, use `orListLazy` instead.
+If your arguments are expensive to calculate, use [`orListLazy`](#orListLazy) instead.
 
     orList
         [ Nothing
@@ -286,7 +286,7 @@ orList maybes =
             Just answer
 
 
-{-| Lazy version of `or`.
+{-| Lazy version of [`or`](#or).
 
 The second argument will only be evaluated if the first argument is `Nothing`.
 
@@ -304,8 +304,8 @@ orLazy ma fmb =
             ma
 
 
-{-| Lazy version of `orElse`.
-Piping-friendly version of `orLazy`.
+{-| Lazy version of [`orElse`](#orElse).
+Piping-friendly version of [`orLazy`](#orLazy).
 
 The first argument will only be evaluated if the second argument is `Nothing`.
 
@@ -324,7 +324,7 @@ orElseLazy fma mb =
             mb
 
 
-{-| Lazy version of `orList`
+{-| Lazy version of [`orList`](#orList)
 
 Stops calculating new values after the first match
 
@@ -357,7 +357,7 @@ orListLazy maybes =
 
 {-| Take all the values that are present, throwing away any `Nothing`s.
 
-Equivalent to `List.filterMap identity`.
+Equivalent to [`List.filterMap identity`](https://package.elm-lang.org/packages/elm/core/latest/List#filterMap).
 
     values [ Just 1, Nothing, Just 2 ]
     --> [ 1, 2 ]
@@ -386,7 +386,7 @@ combine =
     List.foldr (map2 (::)) (Just [])
 
 
-{-| Like `combine`, but map a function over each element of the list first.
+{-| Like [`combine`](#combine), but map a function over each element of the list first.
 
 If every function call succeeds (returns `Just`), `traverse` will return a list.
 If any function call fails (returns `Nothing`), `traverse` will return `Nothing`.
@@ -405,13 +405,17 @@ traverse f =
     List.foldr (\x -> map2 (::) (f x)) (Just [])
 
 
-{-| -}
+{-| Like [`combine`](#combine),
+but works on [`Array`](https://package.elm-lang.org/packages/elm/core/latest/Array) instead of `List`.
+-}
 combineArray : Array.Array (Maybe a) -> Maybe (Array.Array a)
 combineArray =
     Array.foldl (map2 Array.push) (Just Array.empty)
 
 
-{-| -}
+{-| Like [`traverse`](#traverse),
+but works on [`Array`](https://package.elm-lang.org/packages/elm/core/latest/Array) instead of `List`.
+-}
 traverseArray : (a -> Maybe b) -> Array.Array a -> Maybe (Array.Array b)
 traverseArray f =
     Array.foldl (\x -> map2 Array.push (f x)) (Just Array.empty)
@@ -442,7 +446,7 @@ toList m =
             [ x ]
 
 
-{-| Like `toList`, but returns a singleton or empty `Array`.
+{-| Like `toList`, but returns a singleton or empty [`Array`](https://package.elm-lang.org/packages/elm/core/latest/Array).
 
     import Array
 

@@ -6,7 +6,7 @@ Convenience functions for working with Maybe
 
 Pull requests and feature requests are welcome.
 If you want to talk to us, join us on the
-`#elm-community` channels on the [Elm Slack](https://elmlang.slack.com).
+`#elm-community` channel on the [Elm Slack](https://elmlang.slack.com).
 
 ## Tests
 
@@ -15,6 +15,12 @@ This package uses [elm-test](https://github.com/elm-explorations/test) and [elm-
 Run the tests with
 - `npm install`
 - `npm test`
+
+Format with [elm-format](https://github.com/avh4/elm-format)
+- `npx elm-format`
+
+Preview the docs with [elm-doc-preview](https://github.com/dmy/elm-doc-preview)
+- `npx elm-doc-preview`
 
 ## License
 
