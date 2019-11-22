@@ -71,6 +71,21 @@ suite =
                         |> orElseLazy (\() -> Nothing)
                         |> Expect.equal Nothing
             ]
+        , describe "orListLazy"
+            [ test "empty" <|
+                \() ->
+                    []
+                        |> orListLazy
+                        |> Expect.equal Nothing
+            , test "all nothing" <|
+                \() ->
+                    [ \() -> Nothing
+                    , \() -> List.head []
+                    , \() -> String.toInt ""
+                    ]
+                        |> orListLazy
+                        |> Expect.equal Nothing
+            ]
         , describe "traverseArray"
             [ test "empty" <|
                 \() ->
