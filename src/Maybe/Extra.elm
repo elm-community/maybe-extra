@@ -290,7 +290,7 @@ orList maybes =
 
 The second argument will only be evaluated if the first argument is `Nothing`.
 
-    orLazy (Just 4) (\() -> Just 5)
+    orLazy (Just 4) (\() -> Debug.todo "Expensive calculation")
     --> Just 4
 
 -}
@@ -309,8 +309,8 @@ Piping-friendly version of [`orLazy`](#orLazy).
 
 The first argument will only be evaluated if the second argument is `Nothing`.
 
-    List.head []
-        |> orElseLazy (\() -> List.head [ 4 ])
+    Just 4
+        |> orElseLazy (\() -> Debug.todo "Expensive calculation")
     --> Just 4
 
 -}
