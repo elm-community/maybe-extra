@@ -1,7 +1,7 @@
 module Maybe.Extra exposing
     ( isJust, isNothing, join, filter
     , unwrap, unpack
-    , or, orElse, orLazy, orElseLazy
+    , or, orElse, orList, orLazy, orElseLazy, orListLazy
     , values
     , combine, traverse, combineArray, traverseArray
     , toList, toArray
@@ -24,9 +24,11 @@ Work with 1 `Maybe`
 @docs unwrap, unpack
 
 
-# Or: Combine 2 `Maybe`s
+# Or
 
-@docs or, orElse, orLazy, orElseLazy
+Take the first value that's present
+
+@docs or, orElse, orList, orLazy, orElseLazy, orListLazy
 
 
 # Lists of `Maybe`s
@@ -249,6 +251,41 @@ orElse ma mb =
             mb
 
 
+{-| Returns the first value that is present.
+
+All values will be computed.
+If your arguments are expensive to calculate, use `orListLazy` instead.
+
+    orList
+        [ Nothing
+        , Just 1
+        , Just 2
+        ]
+    --> Just 1
+
+    orList
+        [ List.head []
+        , String.toInt ""
+        ]
+    --> Nothing
+
+    orList []
+    --> Nothing
+
+-}
+orList : List (Maybe a) -> Maybe a
+orList maybes =
+    case maybes of
+        [] ->
+            Nothing
+
+        Nothing :: rest ->
+            orList rest
+
+        (Just answer) :: _ ->
+            Just answer
+
+
 {-| Lazy version of `or`.
 
 The second argument will only be evaluated if the first argument is `Nothing`.
@@ -285,6 +322,33 @@ orElseLazy fma mb =
 
         Just _ ->
             mb
+
+
+{-| Lazy version of `orList`
+
+Stops calculating new values after the first match
+
+    orListLazy
+        [ \() -> Nothing
+        , \() -> Just 1
+        , \() -> Debug.todo "Expensive calculation"
+        ]
+    --> Just 1
+
+-}
+orListLazy : List (() -> Maybe a) -> Maybe a
+orListLazy maybes =
+    case maybes of
+        [] ->
+            Nothing
+
+        f :: rest ->
+            case f () of
+                Just answer ->
+                    Just answer
+
+                Nothing ->
+                    orListLazy rest
 
 
 
