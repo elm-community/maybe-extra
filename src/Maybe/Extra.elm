@@ -1,7 +1,7 @@
 module Maybe.Extra exposing
     ( isJust, isNothing, join, filter
     , unwrap, unpack
-    , or, orElse, oneOf, orLazy, orElseLazy, oneOfLazy
+    , or, orElse, orList, orLazy, orElseLazy, orListLazy
     , values
     , combine, traverse, combineArray, traverseArray
     , toList, toArray
@@ -28,7 +28,7 @@ Work with 1 `Maybe`
 
 Take the first value that's present
 
-@docs or, orElse, oneOf, orLazy, orElseLazy, oneOfLazy
+@docs or, orElse, orList, orLazy, orElseLazy, orListLazy
 
 
 # Lists of `Maybe`s
@@ -254,27 +254,27 @@ orElse ma mb =
 {-| Returns the first value that is present.
 
 All values will be computed. There is no short-circuiting.
-If your arguments are expensive to calculate, use `oneOfLazy` instead.
+If your arguments are expensive to calculate, use `orListLazy` instead.
 
-    oneOf
+    orList
         [ Nothing
         , Just 1
         , Just 2
         ]
     --> Just 1
 
-    oneOf
+    orList
         [ List.head []
         , String.toInt ""
         ]
     --> Nothing
 
-    oneOf []
+    orList []
     --> Nothing
 
 -}
-oneOf : List (Maybe a) -> Maybe a
-oneOf maybes =
+orList : List (Maybe a) -> Maybe a
+orList maybes =
     List.foldl orElse Nothing maybes
 
 
@@ -316,11 +316,11 @@ orElseLazy fma mb =
             mb
 
 
-{-| Lazy version of `oneOf`
+{-| Lazy version of `orList`
 
 Stops calculating new values after the first match
 
-    oneOfLazy
+    orListLazy
         [ \() -> Nothing
         , \() -> Just 1
         , \() -> Debug.todo "Expensive calculation"
@@ -328,8 +328,8 @@ Stops calculating new values after the first match
     --> Just 1
 
 -}
-oneOfLazy : List (() -> Maybe a) -> Maybe a
-oneOfLazy maybes =
+orListLazy : List (() -> Maybe a) -> Maybe a
+orListLazy maybes =
     List.foldl orElseLazy Nothing maybes
 
 
