@@ -253,7 +253,7 @@ orElse ma mb =
 
 {-| Returns the first value that is present.
 
-All values will be computed. There is no short-circuiting.
+All values will be computed.
 If your arguments are expensive to calculate, use `orListLazy` instead.
 
     orList
@@ -275,7 +275,15 @@ If your arguments are expensive to calculate, use `orListLazy` instead.
 -}
 orList : List (Maybe a) -> Maybe a
 orList maybes =
-    List.foldl orElse Nothing maybes
+    case maybes of
+        [] ->
+            Nothing
+
+        Nothing :: rest ->
+            orList rest
+
+        (Just answer) :: _ ->
+            Just answer
 
 
 {-| Lazy version of `or`.
@@ -330,7 +338,17 @@ Stops calculating new values after the first match
 -}
 orListLazy : List (() -> Maybe a) -> Maybe a
 orListLazy maybes =
-    List.foldl orElseLazy Nothing maybes
+    case maybes of
+        [] ->
+            Nothing
+
+        f :: rest ->
+            case f () of
+                Just answer ->
+                    Just answer
+
+                Nothing ->
+                    orListLazy rest
 
 
 
