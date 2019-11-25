@@ -3,7 +3,7 @@
     "name": "elm-community/maybe-extra",
     "summary": "Convenience functions for working with Maybe",
     "license": "MIT",
-    "version": "5.0.0",
+    "version": "5.1.0",
     "exposed-modules": [
         "Maybe.Extra"
     ],
