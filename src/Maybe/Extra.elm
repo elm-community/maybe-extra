@@ -1,12 +1,12 @@
 module Maybe.Extra exposing
     ( isJust, isNothing, join, filter
     , unwrap, unpack
-    , or, orElse, orList, orLazy, orElseLazy, orListLazy
+    , or, orElse, orList, orLazy, orElseLazy, orListLazy, oneOf
     , values
     , combine, traverse, combineArray, traverseArray
     , toList, toArray
     , cons
-    , andMap, next, prev, oneOf
+    , andMap, next, prev
     )
 
 {-| Convenience functions for [`Maybe`](https://package.elm-lang.org/packages/elm/core/latest/Maybe).
@@ -28,7 +28,7 @@ Work with 1 `Maybe`
 
 Take the first value that's present
 
-@docs or, orElse, orList, orLazy, orElseLazy, orListLazy
+@docs or, orElse, orList, orLazy, orElseLazy, orListLazy, oneOf
 
 
 # Lists of `Maybe`s
@@ -45,7 +45,7 @@ Take the first value that's present
 
 # Applicative Functions
 
-@docs andMap, next, prev, oneOf
+@docs andMap, next, prev
 
 -}
 
@@ -338,17 +338,38 @@ Stops calculating new values after the first match
 -}
 orListLazy : List (() -> Maybe a) -> Maybe a
 orListLazy maybes =
-    case maybes of
+    oneOf maybes ()
+
+
+{-| Try a list of functions against a value. Return the value of the first call that succeeds (returns `Just`).
+
+    type UserInput
+        = FloatInput Float
+        | IntInput Int
+        | UnknownInput
+
+    "5.6"
+        |> oneOf
+            [ String.toInt >> Maybe.map IntInput
+            , String.toFloat >> Maybe.map FloatInput
+            ]
+        |> Maybe.withDefault UnknownInput
+    --> FloatInput 5.6
+
+-}
+oneOf : List (a -> Maybe b) -> a -> Maybe b
+oneOf fmbs a =
+    case fmbs of
         [] ->
             Nothing
 
-        f :: rest ->
-            case f () of
-                Just answer ->
-                    Just answer
+        fmb :: rest ->
+            case fmb a of
+                Just b ->
+                    Just b
 
                 Nothing ->
-                    orListLazy rest
+                    oneOf rest a
 
 
 
@@ -549,34 +570,3 @@ Advanced functional programmers will recognize this as the implementation of `<*
 prev : Maybe a -> Maybe b -> Maybe a
 prev =
     map2 always
-
-
-{-| Try a list of functions against a value. Return the value of the first call that succeeds (returns `Just`).
-
-    type UserInput
-        = FloatInput Float
-        | IntInput Int
-        | UnknownInput
-
-    "5.6"
-        |> oneOf
-            [ String.toInt >> Maybe.map IntInput
-            , String.toFloat >> Maybe.map FloatInput
-            ]
-        |> Maybe.withDefault UnknownInput
-    --> FloatInput 5.6
-
--}
-oneOf : List (a -> Maybe b) -> a -> Maybe b
-oneOf fmbs a =
-    case fmbs of
-        [] ->
-            Nothing
-
-        fmb :: rest ->
-            case fmb a of
-                Just b ->
-                    Just b
-
-                Nothing ->
-                    oneOf rest a
