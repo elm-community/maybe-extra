@@ -1,5 +1,5 @@
 module Maybe.Extra exposing
-    ( isJust, isNothing, join, filter
+    ( isJust, isNothing, join, filter, guarded, toMaybe
     , unwrap, unpack
     , or, orElse, orList, orLazy, orElseLazy, orListLazy, oneOf
     , values
@@ -16,7 +16,7 @@ module Maybe.Extra exposing
 
 Work with 1 `Maybe`
 
-@docs isJust, isNothing, join, filter
+@docs isJust, isNothing, join, filter, guarded, toMaybe
 
 
 # Get a value out of a `Maybe`
@@ -143,6 +143,42 @@ filter f m =
 
         _ ->
             Nothing
+
+
+{-| Put a value in a maybe dependig on a boolean
+
+    toMaybe True 1
+    --> Nothing
+
+    toMaybe False 1
+    --> Nothing
+
+-}
+toMaybe : Bool -> a -> Maybe a
+toMaybe test value =
+    if test then
+        Just value
+
+    else
+        Nothing
+
+
+{-| Put a value in a Maybe depending on a predicate
+
+    guarded ((<) 10) 5
+    --> Nothing
+
+    guarded ((<) 2) 5
+    --> Just 5
+
+-}
+guarded : (a -> Bool) -> a -> Maybe a
+guarded pred value =
+    if pred value then
+        Just value
+
+    else
+        Nothing
 
 
 

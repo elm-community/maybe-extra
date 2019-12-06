@@ -143,4 +143,24 @@ suite =
                         |> oneOf [ Just, Just << (+) 10, Just << (+) 20 ]
                         |> Expect.equal (Just 0)
             ]
+        , describe "toMaybe"
+            [ test "false" <|
+                \() ->
+                    toMaybe False 0
+                        |> Expect.equal Nothing
+            , test "true" <|
+                \() ->
+                    toMaybe True 0
+                        |> Expect.equal (Just 0)
+            ]
+        , describe "guarded"
+            [ test "Predicate fails" <|
+                \() ->
+                    guarded ((<) 10) 5
+                        |> Expect.equal Nothing
+            , test "Predicate succeeds" <|
+                \() ->
+                    guarded ((<) 2) 5
+                        |> Expect.equal (Just 5)
+            ]
         ]
