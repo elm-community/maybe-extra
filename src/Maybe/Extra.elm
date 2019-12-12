@@ -145,7 +145,7 @@ filter f m =
             Nothing
 
 
-{-| Put a value in a maybe dependig on a boolean
+{-| Put a value in a maybe depending on a boolean
 
     toMaybe True 1
     --> Nothing
