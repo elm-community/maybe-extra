@@ -145,24 +145,6 @@ filter f m =
             Nothing
 
 
-{-| Put a value in a maybe dependig on a boolean
-
-    toMaybe True 1
-    --> Nothing
-
-    toMaybe False 1
-    --> Nothing
-
--}
-toMaybe : Bool -> a -> Maybe a
-toMaybe test value =
-    if test then
-        Just value
-
-    else
-        Nothing
-
-
 {-| Put a value in a Maybe depending on a predicate
 
     guarded ((<) 10) 5
