@@ -1,5 +1,5 @@
 module Maybe.Extra exposing
-    ( isJust, isNothing, join, filter, guarded, toMaybe
+    ( isJust, isNothing, join, filter, guarded
     , unwrap, unpack
     , or, orElse, orList, orLazy, orElseLazy, orListLazy, oneOf
     , values
