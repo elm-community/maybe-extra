@@ -147,20 +147,16 @@ filter f m =
 
 {-| Put a value in a Maybe depending on a predicate
 
-    guarded ((<) 10) 5
+    guarded (not << String.isEmpty) ""
     --> Nothing
 
-    guarded ((<) 2) 5
-    --> Just 5
+    guarded (not << String.isEmpty) "not empty"
+    --> Just "not empty"
 
 -}
 guarded : (a -> Bool) -> a -> Maybe a
-guarded pred value =
-    if pred value then
-        Just value
-
-    else
-        Nothing
+guarded pred =
+    Just >> filter pred
 
 
 

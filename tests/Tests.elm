@@ -9,7 +9,17 @@ import Test exposing (..)
 suite : Test
 suite =
     describe "Maybe.Extra"
-        [ describe "orElse"
+        [ describe "guarded"
+            [ test "Predicate fails" <|
+                \() ->
+                    guarded (not << String.isEmpty) ""
+                        |> Expect.equal Nothing
+            , test "Predicate succeeds" <|
+                \() ->
+                    guarded (not << String.isEmpty) "not empty"
+                        |> Expect.equal (Just "not empty")
+            ]
+        , describe "orElse"
             [ test "both Just" <|
                 \() ->
                     Just 4
@@ -142,15 +152,5 @@ suite =
                     0
                         |> oneOf [ Just, Just << (+) 10, Just << (+) 20 ]
                         |> Expect.equal (Just 0)
-            ]
-        , describe "guarded"
-            [ test "Predicate fails" <|
-                \() ->
-                    guarded ((<) 10) 5
-                        |> Expect.equal Nothing
-            , test "Predicate succeeds" <|
-                \() ->
-                    guarded ((<) 2) 5
-                        |> Expect.equal (Just 5)
             ]
         ]
