@@ -16,7 +16,7 @@ module Maybe.Extra exposing
 
 Work with 1 `Maybe`
 
-@docs isJust, isNothing, join, filter, guarded, toMaybe
+@docs isJust, isNothing, join, filter, guarded
 
 
 # Get a value out of a `Maybe`
