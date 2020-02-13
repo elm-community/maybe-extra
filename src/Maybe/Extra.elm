@@ -7,6 +7,7 @@ module Maybe.Extra exposing
     , toList, toArray
     , cons
     , andMap, next, prev
+    , andThen2, andThen3, andThen4, andThen5
     )
 
 {-| Convenience functions for [`Maybe`](https://package.elm-lang.org/packages/elm/core/latest/Maybe).
@@ -46,6 +47,13 @@ Take the first value that's present
 # Applicative Functions
 
 @docs andMap, next, prev
+
+
+# andThenN
+
+These functions are just like [`andThen`](https://package.elm-lang.org/packages/elm/core/latest/Maybe#andThen), except they take multiple arguments.
+
+@docs andThen2, andThen3, andThen4, andThen5
 
 -}
 
@@ -570,3 +578,46 @@ Advanced functional programmers will recognize this as the implementation of `<*
 prev : Maybe a -> Maybe b -> Maybe a
 prev =
     map2 always
+
+
+{-| Apply a function if all the arguments are `Just` a value.
+
+    import Array exposing (Array)
+
+    array : Array Int
+    array = Array.fromList [1,2,3]
+
+    andThen2 Array.get (Just 1) (Just array)
+    --> Just 2
+
+    andThen2 Array.get Nothing (Just array)
+    --> Nothing
+
+    andThen2 Array.get (Just 1) Nothing
+    --> Nothing
+
+    andThen2 Array.get Nothing Nothing
+    --> Nothing
+
+-}
+andThen2 : (a -> b -> Maybe value) -> Maybe a -> Maybe b -> Maybe value
+andThen2 func ma mb =
+    map2 func ma mb |> andThen identity
+
+
+{-| -}
+andThen3 : (a -> b -> c -> Maybe value) -> Maybe a -> Maybe b -> Maybe c -> Maybe value
+andThen3 func ma mb mc =
+    map3 func ma mb mc |> andThen identity
+
+
+{-| -}
+andThen4 : (a -> b -> c -> d -> Maybe value) -> Maybe a -> Maybe b -> Maybe c -> Maybe d -> Maybe value
+andThen4 func ma mb mc md =
+    map4 func ma mb mc md |> andThen identity
+
+
+{-| -}
+andThen5 : (a -> b -> c -> d -> e -> Maybe value) -> Maybe a -> Maybe b -> Maybe c -> Maybe d -> Maybe e -> Maybe value
+andThen5 func ma mb mc md mf =
+    map5 func ma mb mc md mf |> andThen identity
