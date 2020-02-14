@@ -580,7 +580,7 @@ prev =
     map2 always
 
 
-{-| Apply a function if all the arguments are `Just` a value.
+{-| Apply a function that returns a `Maybe` if all the arguments are `Just` a value.
 
     import Array exposing (Array)
 
@@ -594,9 +594,6 @@ prev =
     --> Nothing
 
     andThen2 Array.get (Just 1) Nothing
-    --> Nothing
-
-    andThen2 Array.get Nothing Nothing
     --> Nothing
 
 -}
