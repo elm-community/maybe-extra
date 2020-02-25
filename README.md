@@ -24,5 +24,5 @@ Preview the docs with [elm-doc-preview](https://github.com/dmy/elm-doc-preview)
 
 ## License
 
-The source code for this package is released under the terms of the BSD3
+The source code for this package is released under the terms of the MIT
 license. See the `LICENSE` file.
