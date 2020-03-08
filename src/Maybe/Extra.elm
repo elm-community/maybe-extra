@@ -537,6 +537,9 @@ cons item list =
     andThen2 Array.get (Just 1) Nothing
     --> Nothing
 
+    andThen2 Array.get (Just 4) (Just array)
+    --> Nothing
+
 -}
 andThen2 : (a -> b -> Maybe value) -> Maybe a -> Maybe b -> Maybe value
 andThen2 func ma mb =
