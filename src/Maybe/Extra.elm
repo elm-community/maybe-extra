@@ -7,7 +7,7 @@ module Maybe.Extra exposing
     , toList, toArray
     , cons
     , andMap, next, prev
-    , andThen2, andThen3, andThen4, andThen5
+    , andThen2, andThen3, andThen4
     )
 
 {-| Convenience functions for [`Maybe`](https://package.elm-lang.org/packages/elm/core/latest/Maybe).
@@ -53,7 +53,7 @@ Take the first value that's present
 
 These functions are just like [`andThen`](https://package.elm-lang.org/packages/elm/core/latest/Maybe#andThen), except they take multiple arguments.
 
-@docs andThen2, andThen3, andThen4, andThen5
+@docs andThen2, andThen3, andThen4
 
 -}
 
@@ -612,9 +612,3 @@ andThen3 func ma mb mc =
 andThen4 : (a -> b -> c -> d -> Maybe value) -> Maybe a -> Maybe b -> Maybe c -> Maybe d -> Maybe value
 andThen4 func ma mb mc md =
     map4 func ma mb mc md |> andThen identity
-
-
-{-| -}
-andThen5 : (a -> b -> c -> d -> e -> Maybe value) -> Maybe a -> Maybe b -> Maybe c -> Maybe d -> Maybe e -> Maybe value
-andThen5 func ma mb mc md mf =
-    map5 func ma mb mc md mf |> andThen identity
