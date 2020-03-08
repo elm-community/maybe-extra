@@ -143,4 +143,25 @@ suite =
                         |> oneOf [ Just, Just << (+) 10, Just << (+) 20 ]
                         |> Expect.equal (Just 0)
             ]
+        , describe "andThen3"
+            [ test "returns a Just if it can" <|
+                \() ->
+                    andThen3
+                        (\a b c -> Just (a + b + c))
+                        (Just 4)
+                        (Just 2)
+                        (Just 1)
+                        |> Expect.equal (Just 7)
+            ]
+        , describe "andThen4"
+            [ test "returns a Just if it can" <|
+                \() ->
+                    andThen4
+                        (\a b c d -> Just (a + b + c + d))
+                        (Just 8)
+                        (Just 4)
+                        (Just 2)
+                        (Just 1)
+                        |> Expect.equal (Just 15)
+            ]
         ]

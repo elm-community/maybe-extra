@@ -6,6 +6,7 @@ module Maybe.Extra exposing
     , combine, traverse, combineArray, traverseArray
     , toList, toArray
     , cons
+    , andThen2, andThen3, andThen4
     , andMap, next, prev
     )
 
@@ -41,6 +42,15 @@ Take the first value that's present
 
 @docs toList, toArray
 @docs cons
+
+
+# andThenN
+
+These functions are just like [`andThen`](https://package.elm-lang.org/packages/elm/core/latest/Maybe#andThen), except they take multiple arguments.
+
+All arguments must be `Just` and the function must return a `Just` for the result to be `Just`.
+
+@docs andThen2, andThen3, andThen4
 
 
 # Applicative Functions
@@ -505,6 +515,92 @@ cons item list =
 
         Nothing ->
             list
+
+
+
+-- andThenN
+
+
+{-|
+
+    import Array exposing (Array)
+
+    array : Array Int
+    array = Array.fromList [1,2,3]
+
+    andThen2 Array.get (Just 1) (Just array)
+    --> Just 2
+
+    andThen2 Array.get Nothing (Just array)
+    --> Nothing
+
+    andThen2 Array.get (Just 1) Nothing
+    --> Nothing
+
+    andThen2 Array.get (Just 4) (Just array)
+    --> Nothing
+
+-}
+andThen2 : (a -> b -> Maybe value) -> Maybe a -> Maybe b -> Maybe value
+andThen2 func ma mb =
+    case ma of
+        Just a ->
+            case mb of
+                Just b ->
+                    func a b
+
+                Nothing ->
+                    Nothing
+
+        Nothing ->
+            Nothing
+
+
+{-| -}
+andThen3 : (a -> b -> c -> Maybe value) -> Maybe a -> Maybe b -> Maybe c -> Maybe value
+andThen3 func ma mb mc =
+    case ma of
+        Just a ->
+            case mb of
+                Just b ->
+                    case mc of
+                        Just c ->
+                            func a b c
+
+                        Nothing ->
+                            Nothing
+
+                Nothing ->
+                    Nothing
+
+        Nothing ->
+            Nothing
+
+
+{-| -}
+andThen4 : (a -> b -> c -> d -> Maybe value) -> Maybe a -> Maybe b -> Maybe c -> Maybe d -> Maybe value
+andThen4 func ma mb mc md =
+    case ma of
+        Just a ->
+            case mb of
+                Just b ->
+                    case mc of
+                        Just c ->
+                            case md of
+                                Just d ->
+                                    func a b c d
+
+                                Nothing ->
+                                    Nothing
+
+                        Nothing ->
+                            Nothing
+
+                Nothing ->
+                    Nothing
+
+        Nothing ->
+            Nothing
 
 
 
