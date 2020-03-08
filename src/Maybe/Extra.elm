@@ -50,6 +50,8 @@ These functions are just like [`andThen`](https://package.elm-lang.org/packages/
 
 All arguments must be `Just` and the function must return a `Just` for the result to be `Just`.
 
+If you need a version of `andThenN` that takes more than 4 arguments, you can chain together [`andMap`](#andMap) calls in a pipeline.
+
 @docs andThen2, andThen3, andThen4
 
 
@@ -159,10 +161,29 @@ filter f m =
 -- Get a value out of a `Maybe`
 
 
-{-| Apply the function to the value in the `Maybe` and return it unwrapped.
-If the `Maybe` is `Nothing`, use the default value instead.
+{-| Like using a `case`.
+Give a function that says what to do if the input is `Just`,
+and a value to use if the input is `Nothing`.
 
-`unwrap default f` is equivalent to `Maybe.map f >> Maybe.withDefault default`.
+These are all equivalent:
+
+    unwrap default f maybeX
+
+    maybeX
+        |> Maybe.map f
+        |> Maybe.withDefault default
+
+    case maybeX of
+        Just x ->
+            f x
+
+        Nothing ->
+            default
+
+Except that unlike a `case`, the default value for `unwrap` is always computed.
+If your default value is expensive to compute, use the lazy [`unpack`](#unpack) instead.
+
+Examples:
 
     unwrap 0 String.length Nothing
     --> 0
@@ -189,6 +210,15 @@ and will only be computed if the `Maybe` is `Nothing`.
 
     unpack (\() -> 0) String.length (Just "abc")
     --> 3
+
+`unpack (\() -> default) f maybeX` is equivalent to
+
+    case maybeX of
+        Just x ->
+            f x
+
+        Nothing ->
+            default
 
 -}
 unpack : (() -> b) -> (a -> b) -> Maybe a -> b
@@ -621,6 +651,25 @@ If either argument is `Nothing`, return `Nothing`.
     Just ((+) 2)
         |> andMap Nothing
     --> Nothing
+
+This can be used to do [`Maybe.mapN`](https://package.elm-lang.org/packages/elm/core/latest/Maybe#map2) or [`andThenN`](#andThenN) for any number of arguments.
+
+    -- map4
+    Just (\a b c d -> a + b + c + d )
+        |> andMap (Just 1)
+        |> andMap (Just 2)
+        |> andMap (Just 4)
+        |> andMap (Just 8)
+    --> Just 15
+
+    -- andThen4
+    Just (\a b c d -> Just (a + b + c + d ))
+        |> andMap (Just 1)
+        |> andMap (Just 2)
+        |> andMap (Just 4)
+        |> andMap (Just 8)
+        |> join
+    --> Just 15
 
 Advanced functional programmers will recognize this as the implementation of `<*>` for `Maybe`s from the `Applicative` typeclass.
 
