@@ -48,6 +48,8 @@ Take the first value that's present
 
 These functions are just like [`andThen`](https://package.elm-lang.org/packages/elm/core/latest/Maybe#andThen), except they take multiple arguments.
 
+All arguments must be `Just` and the function must return a `Just` for the result to be `Just`.
+
 @docs andThen2, andThen3, andThen4
 
 
@@ -519,7 +521,7 @@ cons item list =
 -- andThenN
 
 
-{-| Apply a function that returns a `Maybe` if all the arguments are `Just` a value.
+{-|
 
     import Array exposing (Array)
 
