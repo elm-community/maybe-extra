@@ -543,19 +543,64 @@ cons item list =
 -}
 andThen2 : (a -> b -> Maybe value) -> Maybe a -> Maybe b -> Maybe value
 andThen2 func ma mb =
-    map2 func ma mb |> andThen identity
+    case ma of
+        Just a ->
+            case mb of
+                Just b ->
+                    func a b
+
+                Nothing ->
+                    Nothing
+
+        Nothing ->
+            Nothing
 
 
 {-| -}
 andThen3 : (a -> b -> c -> Maybe value) -> Maybe a -> Maybe b -> Maybe c -> Maybe value
 andThen3 func ma mb mc =
-    map3 func ma mb mc |> andThen identity
+    case ma of
+        Just a ->
+            case mb of
+                Just b ->
+                    case mc of
+                        Just c ->
+                            func a b c
+
+                        Nothing ->
+                            Nothing
+
+                Nothing ->
+                    Nothing
+
+        Nothing ->
+            Nothing
 
 
 {-| -}
 andThen4 : (a -> b -> c -> d -> Maybe value) -> Maybe a -> Maybe b -> Maybe c -> Maybe d -> Maybe value
 andThen4 func ma mb mc md =
-    map4 func ma mb mc md |> andThen identity
+    case ma of
+        Just a ->
+            case mb of
+                Just b ->
+                    case mc of
+                        Just c ->
+                            case md of
+                                Just d ->
+                                    func a b c d
+
+                                Nothing ->
+                                    Nothing
+
+                        Nothing ->
+                            Nothing
+
+                Nothing ->
+                    Nothing
+
+        Nothing ->
+            Nothing
 
 
 
