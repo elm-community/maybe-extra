@@ -159,10 +159,29 @@ filter f m =
 -- Get a value out of a `Maybe`
 
 
-{-| Apply the function to the value in the `Maybe` and return it unwrapped.
-If the `Maybe` is `Nothing`, use the default value instead.
+{-| Like using a `case`.
+Give a function that says what to do if the input is `Just`,
+and a value to use if the input is `Nothing`.
 
-`unwrap default f` is equivalent to `Maybe.map f >> Maybe.withDefault default`.
+These are all equivalent:
+
+    unwrap default f maybeX
+
+    maybeX
+        |> Maybe.map f
+        |> Maybe.withDefault default
+
+    case maybeX of
+        Just x ->
+            f x
+
+        Nothing ->
+            default
+
+Except that unlike a `case`, the default value for `unwrap` is always computed.
+If your default value is expensive to compute, use the lazy [`unpack`](#unpack) instead.
+
+Examples:
 
     unwrap 0 String.length Nothing
     --> 0
@@ -189,6 +208,15 @@ and will only be computed if the `Maybe` is `Nothing`.
 
     unpack (\() -> 0) String.length (Just "abc")
     --> 3
+
+`unpack (\() -> default) f maybeX` is equivalent to
+
+    case maybeX of
+        Just x ->
+            f x
+
+        Nothing ->
+            default
 
 -}
 unpack : (() -> b) -> (a -> b) -> Maybe a -> b
