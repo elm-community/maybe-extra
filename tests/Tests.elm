@@ -164,4 +164,24 @@ suite =
                         (Just 1)
                         |> Expect.equal (Just 15)
             ]
+        , describe "unwrap"
+            [ test "returns the default value if it is a Nothing" <|
+                \() ->
+                    unwrap 0 String.length Nothing
+                        |> Expect.equal 0
+            , test "returns the unwrapped value if it is a Just" <|
+                \() ->
+                    unwrap 0 String.length (Just "abc")
+                        |> Expect.equal 3
+            ]
+        , describe "unpack"
+            [ test "returns the default value if it is a Nothing" <|
+                \() ->
+                    unpack (\() -> 0) String.length Nothing
+                        |> Expect.equal 0
+            , test "returns the unpackped value if it is a Just" <|
+                \() ->
+                    unpack (\() -> 0) String.length (Just "abc")
+                        |> Expect.equal 3
+            ]
         ]
