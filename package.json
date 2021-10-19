@@ -7,11 +7,9 @@
     "test": "elm-verify-examples && elm-test && npm run test:format && npm run test:docs",
     "postinstall": "elm-tooling install"
   },
-  "dependencies": {
-    "elm-doc-preview": "^3.0.4",
-    "elm-verify-examples": "^5.0.0"
-  },
   "devDependencies": {
-    "elm-tooling": "^1.6.0"
+    "elm-doc-preview": "^5.0.5",
+    "elm-tooling": "^1.6.0",
+    "elm-verify-examples": "^5.2.0"
   }
 }
