@@ -149,11 +149,15 @@ join mx =
 -}
 filter : (a -> Bool) -> Maybe a -> Maybe a
 filter f m =
-    case Maybe.map f m of
-        Just True ->
-            m
+    case m of
+        Just a ->
+            if f a then
+                m
 
-        _ ->
+            else
+                Nothing
+
+        Nothing ->
             Nothing
 
 
