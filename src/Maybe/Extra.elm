@@ -1,5 +1,5 @@
 module Maybe.Extra exposing
-    ( isJust, isNothing, join, filter
+    ( isJust, isNothing, join, filter, concatMap
     , unwrap, unpack
     , or, orElse, orList, orLazy, orElseLazy, orListLazy, oneOf
     , values
@@ -17,7 +17,7 @@ module Maybe.Extra exposing
 
 Work with 1 `Maybe`
 
-@docs isJust, isNothing, join, filter
+@docs isJust, isNothing, join, filter, concatMap
 
 
 # Get a value out of a `Maybe`
@@ -133,6 +133,31 @@ join mx =
 
         Nothing ->
             Nothing
+
+
+{-| Like `Maybe.andThen` but with the arguments flipped.
+
+    parseMonth : String -> Maybe Int
+    parseMonth =
+        String.toInt >> concatMap toValidMonth
+
+    toValidMonth : Int -> Maybe Int
+    toValidMonth month =
+        if 1 <= month && month <= 12 then
+            Just month
+        else
+            Nothing
+
+    parseMonth "12"
+    --> Just 12
+
+    parseMonth "13"
+    --> Nothing
+
+-}
+concatMap : (a -> Maybe b) -> Maybe a -> Maybe b
+concatMap f =
+    map f >> join
 
 
 {-| Keep the `Maybe` only if the predicate function passes
