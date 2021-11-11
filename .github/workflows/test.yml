@@ -11,5 +11,9 @@ jobs:
         with:
           node-version: '14'
           cache: 'npm'
+      - uses: actions/cache@v2
+        with:
+          path: ~/.elm
+          key: ${{ runner.os }}-elm-${{ hashFiles('package-lock.json', 'elm-tooling.json', 'elm.json') }}
       - run: npm ci
       - run: npm test
