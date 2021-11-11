@@ -12,5 +12,4 @@ jobs:
           node-version: '14'
           cache: 'npm'
       - run: npm ci
-      - run: npx elm-tooling install
       - run: npm test
