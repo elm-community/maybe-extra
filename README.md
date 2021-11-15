@@ -1,6 +1,6 @@
 # Maybe.Extra
 
-[![Build Status](https://github.com/elm-community/maybe-extra/workflows/test.yml/badge.svg)](https://github.com/elm-community/maybe-extra/actions)
+[![Build Status](https://github.com/elm-community/maybe-extra/actions/workflows/test.yml/badge.svg)](https://github.com/elm-community/maybe-extra/actions/workflows/test.yml)
 
 Convenience functions for working with Maybe
 
