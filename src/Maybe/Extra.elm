@@ -447,8 +447,23 @@ If there are any `Nothing`s, the whole function fails and returns `Nothing`.
 
 -}
 combine : List (Maybe a) -> Maybe (List a)
-combine =
-    List.foldr (map2 (::)) (Just [])
+combine list =
+    combineHelp list []
+
+
+combineHelp : List (Maybe a) -> List a -> Maybe (List a)
+combineHelp list acc =
+    case list of
+        head :: tail ->
+            case head of
+                Just a ->
+                    combineHelp tail (a :: acc)
+
+                Nothing ->
+                    Nothing
+
+        [] ->
+            Just (List.reverse acc)
 
 
 {-| Like [`combine`](#combine), but map a function over each element of the list first.
