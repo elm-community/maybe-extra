@@ -698,8 +698,13 @@ Advanced functional programmers will recognize this as the implementation of `*>
 
 -}
 next : Maybe a -> Maybe b -> Maybe b
-next =
-    map2 (\b a -> always a b)
+next a b =
+    case a of
+        Nothing ->
+            Nothing
+
+        Just _ ->
+            b
 
 
 {-| Take two `Maybe` values. If the second one equals `Nothing`, return `Nothing`. Otherwise return the first value.
@@ -717,5 +722,10 @@ Advanced functional programmers will recognize this as the implementation of `<*
 
 -}
 prev : Maybe a -> Maybe b -> Maybe a
-prev =
-    map2 always
+prev a b =
+    case b of
+        Nothing ->
+            Nothing
+
+        Just _ ->
+            a
