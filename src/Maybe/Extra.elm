@@ -1,6 +1,6 @@
 module Maybe.Extra exposing
     ( isJust, isNothing, join, filter
-    , unwrap, unpack
+    , withDefaultLazy, unwrap, unpack
     , or, orElse, orList, orLazy, orElseLazy, orListLazy, oneOf
     , values
     , combine, traverse, combineArray, traverseArray
@@ -22,7 +22,7 @@ Work with 1 `Maybe`
 
 # Get a value out of a `Maybe`
 
-@docs unwrap, unpack
+@docs withDefaultLazy, unwrap, unpack
 
 
 # Or
@@ -163,6 +163,29 @@ filter f m =
 
 
 -- Get a value out of a `Maybe`
+
+
+{-| Lazy version of [Maybe.withDefault](https://package.elm-lang.org/packages/elm/core/latest/Maybe#withDefault).
+
+It will only calculate the default if needed.
+
+Examples:
+
+    withDefaultLazy (\() -> 2 + 2) Nothing
+    --> 4
+
+    withDefaultLazy (\() -> Debug.todo "Expensive calculation") (Just 4)
+    --> 4
+
+-}
+withDefaultLazy : (() -> a) -> Maybe a -> a
+withDefaultLazy default m =
+    case m of
+        Nothing ->
+            default ()
+
+        Just a ->
+            a
 
 
 {-| Like using a `case`.
